@@ -36,7 +36,7 @@ export class AuthService {
       where: { user: { id: user.id } },
       select: { id: true, passwordHash: true },
     });
-    console.log('User Password Record from DB:', userPassword);
+
     if (!userPassword) {
       throw new UnauthorizedException('Invalid email or password');
     }
