@@ -32,12 +32,13 @@ export class UsersService {
       throw new ConflictException('Email already exists');
     }
 
+    const targetRoleName = roleName ? roleName.toUpperCase() : 'USER';
     //check if the role exists
     const role = await this.roleRepository.findOne({
-      where: { name: roleName.toUpperCase() },
+      where: { name: targetRoleName },
     });
     if (!role) {
-      throw new NotFoundException(`Role with name ${roleName} does not exist`);
+      throw new NotFoundException(`Role with name ${targetRoleName} does not exist`);
     }
 
     //password hashing 
