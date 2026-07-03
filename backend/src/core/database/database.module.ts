@@ -9,6 +9,7 @@ import { User } from 'src/users/entities/user.entity';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('POSTGRES_HOST'),
@@ -16,10 +17,9 @@ import { User } from 'src/users/entities/user.entity';
         username: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
-        entities:[User, Password, Role],
+        entities: [User, Password, Role],
         synchronize: true,
       }),
-      inject: [ConfigService],
     }),
   ],
 })
