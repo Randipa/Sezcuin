@@ -17,7 +17,10 @@ import { Roles } from 'src/core/decorators/roles.decorator';
 import { Permissions } from 'src/core/decorators/permissions.decorator';
 import { RolesGuard } from 'src/core/guards/roles.guard';
 import { PermissionsGuard } from 'src/core/guards/permissions.guard';
+import { ApiBearerAuth, ApiTags } from 'node_modules/@nestjs/swagger';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -34,7 +37,7 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-//Get user by id with role assignment
+  //Get user by id with role assignment
   @Get(':id')
   @Roles('ADMIN')
   @Permissions('user:read')
