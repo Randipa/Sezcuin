@@ -30,26 +30,32 @@ export class UsersController {
   @Get()
   @Roles('ADMIN')
   @Permissions('user:read')
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
   findAll() {
     return this.usersService.findAll();
   }
-
+//Get user by id with role assignment
   @Get(':id')
+  @Roles('ADMIN')
+  @Permissions('user:read')
+  @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @Roles('ADMIN')
   @Permissions('user:update')
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
+  @Roles('ADMIN')
+  @Permissions('user:delete')
+  @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }
