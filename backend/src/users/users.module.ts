@@ -8,11 +8,12 @@ import { Password } from './entities/password.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { RolesGuard } from 'src/core/guards/roles.guard';
 import { Reflector } from '@nestjs/core';
+import { PermissionsGuard } from 'src/core/guards/permissions.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User,Password]), RolesModule,AuthModule],
   controllers: [UsersController],
-  providers: [UsersService,RolesGuard,Reflector],
+  providers: [UsersService,RolesGuard,Reflector,PermissionsGuard],
   exports: [TypeOrmModule],
 })
 export class UsersModule {}

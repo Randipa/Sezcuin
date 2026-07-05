@@ -14,7 +14,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
 import { Role } from 'src/roles/entities/role.entity';
 import { Roles } from 'src/core/decorators/roles.decorator';
+import { Permissions } from 'src/core/decorators/permissions.decorator';
 import { RolesGuard } from 'src/core/guards/roles.guard';
+import { PermissionsGuard } from 'src/core/guards/permissions.guard';
 
 @Controller('users')
 export class UsersController {
@@ -27,7 +29,8 @@ export class UsersController {
 
   @Get()
   @Roles('ADMIN')
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Permissions('user:read')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   findAll() {
     return this.usersService.findAll();
   }
