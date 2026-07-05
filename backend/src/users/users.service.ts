@@ -68,13 +68,25 @@ export class UsersService {
     return savedUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return this.userRepository.find(
+      {
+        relations: { role: true },
+      }
+    );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: { role: true },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
+  
   //Update user method with role assignment
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { roleName, ...userData } = updateUserDto;
@@ -103,7 +115,7 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }
