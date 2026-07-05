@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,10 +42,12 @@ export class UsersService {
       where: { name: targetRoleName },
     });
     if (!role) {
-      throw new NotFoundException(`Role with name ${targetRoleName} does not exist`);
+      throw new NotFoundException(
+        `Role with name ${targetRoleName} does not exist`,
+      );
     }
 
-    //password hashing 
+    //password hashing
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -69,9 +75,32 @@ export class UsersService {
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
+  //Update user method with role assignment
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const { roleName, ...userData } = updateUserDto;
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: { role: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    Object.assign(user, userData);
+
+    if (roleName) {
+      const role = await this.roleRepository.findOne({
+        where: { name: roleName },
+      });
+      if (!role) {
+        throw new NotFoundException(`Role with name ${roleName} does not exist`);
+      }
+      user.role = role;
+    }
+
+    return await this.userRepository.save(user);
   }
 
   remove(id: number) {
