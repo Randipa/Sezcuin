@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,7 +24,9 @@ export class RolesService {
       where: { name: normalizedName },
     });
     if (existingRole) {
-      throw new ConflictException(`Role with name ${normalizedName} already exists`);
+      throw new ConflictException(
+        `Role with name ${normalizedName} already exists`,
+      );
     }
 
     const newRole = this.roleRepository.create({
@@ -35,15 +41,56 @@ export class RolesService {
     return this.roleRepository.find();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} role`;
+  async findOne(id: string) {
+    const role = await this.roleRepository.findOne({ where: { id } });
+    if (!role) {
+      throw new NotFoundException(`Role with ID ${id} not found`);
+    }
+    return role;
   }
 
-  update(id: string, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: string, updateRoleDto: UpdateRoleDto) {
+    const role = await this.findOne(id);
+    const { name, permissions } = updateRoleDto;
+
+    if (name) {
+      const normalizedName = name.toUpperCase();
+      if (normalizedName !== role.name) {
+        const existingRole = await this.roleRepository.findOne({
+          where: { name: normalizedName },
+        });
+        if (existingRole) {
+          throw new ConflictException(
+            `Role with name ${normalizedName} already exists`,
+          );
+        }
+      }
+      role.name = normalizedName;
+    }
+
+    if (permissions) {
+      role.permissions = permissions;
+    }
+
+    return this.roleRepository.save(role);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} role`;
+  async remove(id: string) {
+    const role = await this.roleRepository.findOne({
+      where: { id },
+      relations: { users: true },
+    });
+    if (!role) {
+      throw new NotFoundException(`Role with ID ${id} not found`);
+    }
+
+    if (role.users?.length) {
+      throw new ConflictException(
+        'Cannot delete a role that is still assigned to one or more users',
+      );
+    }
+
+    await this.roleRepository.remove(role);
+    return { id };
   }
 }
