@@ -69,11 +69,9 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.userRepository.find(
-      {
-        relations: { role: true },
-      }
-    );
+    return this.userRepository.find({
+      relations: { role: true },
+    });
   }
 
   async findOne(id: string) {
@@ -86,7 +84,7 @@ export class UsersService {
     }
     return user;
   }
-  
+
   //Update user method with role assignment
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { roleName, ...userData } = updateUserDto;
@@ -107,7 +105,9 @@ export class UsersService {
         where: { name: roleName },
       });
       if (!role) {
-        throw new NotFoundException(`Role with name ${roleName} does not exist`);
+        throw new NotFoundException(
+          `Role with name ${roleName} does not exist`,
+        );
       }
       user.role = role;
     }
@@ -115,7 +115,13 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    await this.userRepository.remove(user);
+    return { id };
   }
 }

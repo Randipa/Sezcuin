@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core/services/reflector.service';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
+import { AuthenticatedRequest } from '../types/authenticated-request';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -19,11 +20,11 @@ export class PermissionsGuard implements CanActivate {
     if (!requiredPermissions) {
       return true;
     }
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
-    const userPermissions: string[] = (user?.permissions || []).map((p: any) =>
-      typeof p === 'string' ? p.toUpperCase() : p.name?.toUpperCase(),
+    const userPermissions = (user?.permissions ?? []).map((permission) =>
+      permission.toUpperCase(),
     );
 
     const hasRequiredPermissions = requiredPermissions.every((permission) =>

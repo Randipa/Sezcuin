@@ -12,7 +12,6 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
-import { Role } from 'src/roles/entities/role.entity';
 import { Roles } from 'src/core/decorators/roles.decorator';
 import { Permissions } from 'src/core/decorators/permissions.decorator';
 import { RolesGuard } from 'src/core/guards/roles.guard';
@@ -26,6 +25,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
+  @Roles('ADMIN')
+  @Permissions('user:create')
+  @UseGuards(JwtAuthGuard, PermissionsGuard, RolesGuard)
   async register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.register(createUserDto);
   }

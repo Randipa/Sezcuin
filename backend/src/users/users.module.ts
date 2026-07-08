@@ -11,9 +11,13 @@ import { Reflector } from '@nestjs/core';
 import { PermissionsGuard } from 'src/core/guards/permissions.guard';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User,Password]), RolesModule,AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Password]),
+    RolesModule,
+    AuthModule,
+  ],
   controllers: [UsersController],
-  providers: [UsersService,RolesGuard,Reflector,PermissionsGuard],
+  providers: [UsersService, RolesGuard, Reflector, PermissionsGuard],
   exports: [TypeOrmModule],
 })
 export class UsersModule {}

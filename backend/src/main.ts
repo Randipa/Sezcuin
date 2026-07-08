@@ -8,13 +8,14 @@ import { DocumentBuilder } from 'node_modules/@nestjs/swagger/dist/document-buil
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
 
   app.useGlobalFilters(new AllExceptionsFilter());
-
 
   //impliment swagger
   const config = new DocumentBuilder()
@@ -25,6 +26,12 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  //add cross origin resource sharing (CORS) to allow requests from the frontend
+  app.enableCors({
+    origin: 'http://localhost:3002',
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }

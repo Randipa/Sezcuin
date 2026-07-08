@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Password } from 'src/users/entities/password.entity';
@@ -48,6 +52,12 @@ export class AuthService {
     );
     if (!isPasswordMatch) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.isActive) {
+      throw new ForbiddenException(
+        'Your account has been deactivated. Please contact an administrator.',
+      );
     }
 
     // Generate JWT token
