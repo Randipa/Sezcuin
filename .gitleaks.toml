@@ -1,0 +1,18 @@
+title = "Sezcuin gitleaks configuration"
+
+# Build on top of the bundled ruleset so all default detections stay active.
+[extend]
+useDefault = true
+
+[allowlist]
+description = """
+CloudFormation stack outputs are read via the AWS CLI JMESPath idiom
+`--query "Stacks[0].Outputs[?OutputKey=='<Name>'].OutputValue"`. The default
+generic-api-key rule flags the `OutputKey=='<Name>'` fragment as a high-entropy
+secret, which it is not. Scope the exception to lines containing that fragment
+so real credentials elsewhere are still detected.
+"""
+regexTarget = "line"
+regexes = [
+  '''OutputKey==''',
+]
