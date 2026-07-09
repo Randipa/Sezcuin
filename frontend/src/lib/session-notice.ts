@@ -1,5 +1,8 @@
 const SESSION_NOTICE_KEY = 'sezcuin-session-notice';
 
+export const SESSION_EXPIRED_MESSAGE =
+  'Your session has expired. Please sign in again.';
+
 export function setSessionEndedNotice(message: string) {
   if (typeof window === 'undefined') {
     return;
