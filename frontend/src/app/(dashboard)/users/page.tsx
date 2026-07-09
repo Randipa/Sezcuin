@@ -1,7 +1,7 @@
 'use client';
 
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { App, Button, Space, Tag, Typography } from 'antd';
+import { Alert, App, Button, Space, Tag, Typography } from 'antd';
 import type { TableProps } from 'antd';
 import { useState } from 'react';
 import { Can } from '@/components/common/can';
@@ -15,7 +15,7 @@ import { ApiError } from '@/lib/api/error';
 import { PERMISSIONS } from '@/lib/permissions';
 
 export default function UsersPage() {
-  const { data: users, isLoading } = useUsersQuery();
+  const { data: users, isLoading, isError, error } = useUsersQuery();
   const deleteMutation = useDeleteUserMutation();
   const { message } = App.useApp();
 
@@ -112,17 +112,28 @@ export default function UsersPage() {
         </Can>
       </div>
 
-      <DataTable<UserRecord>
-        data={users}
-        loading={isLoading}
-        rowKey={(record) => record.id}
-        columns={columns}
-        searchPlaceholder="Search by name or email"
-        filterPredicate={(record, query) =>
-          `${record.firstName} ${record.lastName} ${record.email}`.toLowerCase().includes(query)
-        }
-        onRowClick={(record) => setDetailUser(record)}
-      />
+      {isError ? (
+        <Alert
+          type="error"
+          showIcon
+          message="Failed to load users"
+          description={
+            error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
+          }
+        />
+      ) : (
+        <DataTable<UserRecord>
+          data={users}
+          loading={isLoading}
+          rowKey={(record) => record.id}
+          columns={columns}
+          searchPlaceholder="Search by name or email"
+          filterPredicate={(record, query) =>
+            `${record.firstName} ${record.lastName} ${record.email}`.toLowerCase().includes(query)
+          }
+          onRowClick={(record) => setDetailUser(record)}
+        />
+      )}
 
       <UserDetailDrawer
         open={!!detailUser}

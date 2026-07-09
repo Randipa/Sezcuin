@@ -34,12 +34,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthenticatedUserPayload> {
-    // Re-checked on every request (rather than trusting the token payload)
-    // so a deactivated account is locked out immediately, not just at its
-    // next login attempt or once the existing token happens to expire.
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
-      select: { id: true, isActive: true },
+      relations: { role: true },
+      select: {
+        id: true,
+        email: true,
+        isActive: true,
+        role: { id: true, name: true, permissions: true },
+      },
     });
 
     if (!user || !user.isActive) {
@@ -49,10 +52,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     return {
-      userId: payload.sub,
-      email: payload.email,
-      role: payload.role,
-      permissions: payload.permissions,
+      userId: user.id,
+      email: user.email,
+      role: user.role.name,
+      permissions: user.role.permissions ?? [],
     };
   }
 }

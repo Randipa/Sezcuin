@@ -18,12 +18,6 @@ const ADMIN_PERMISSIONS = [
   'role:delete',
 ];
 
-/**
- * Idempotent bootstrap script. Since user and role management endpoints are
- * ADMIN-only by design, the very first ADMIN role and account can't be
- * created through the API - it has to exist before anyone can log in.
- * Safe to run multiple times: it only creates what's missing.
- */
 async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
 
@@ -40,8 +34,6 @@ async function seed() {
     );
     console.log('Created ADMIN role');
   } else {
-    // The ADMIN role must always carry the full permission set, even in
-    // environments seeded before new guarded resources (e.g. Roles) existed.
     const missingPermissions = ADMIN_PERMISSIONS.filter(
       (permission) => !adminRole!.permissions?.includes(permission),
     );
@@ -69,16 +61,21 @@ async function seed() {
     console.log('USER role already exists, skipping');
   }
 
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@sezcuin.com';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL;
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      'SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be set in .env before running seed.',
+    );
+  }
+
   const existingAdmin = await userRepository.findOne({
     where: { email: adminEmail },
+    relations: { role: true },
   });
 
   if (!existingAdmin) {
-    const configuredPassword = process.env.SEED_ADMIN_PASSWORD;
-    const usingDefaultPassword = !configuredPassword;
-    const adminPassword = configuredPassword ?? 'Admin@12345';
-
     const admin = await userRepository.save(
       userRepository.create({
         email: adminEmail,
@@ -97,13 +94,32 @@ async function seed() {
     );
 
     console.log(`Created ADMIN user ${adminEmail}`);
-    console.log(
-      usingDefaultPassword
-        ? 'SEED_ADMIN_PASSWORD was not set; a built-in default password was used. Sign in and change it immediately.'
-        : 'Sign in using the password from SEED_ADMIN_PASSWORD, then change it after first login.',
-    );
   } else {
-    console.log(`Admin user ${adminEmail} already exists, skipping`);
+    const passwordHash = await bcrypt.hash(
+      adminPassword,
+      await bcrypt.genSalt(10),
+    );
+    const existingPassword = await passwordRepository.findOne({
+      where: { user: { id: existingAdmin.id } },
+    });
+
+    if (existingPassword) {
+      existingPassword.passwordHash = passwordHash;
+      await passwordRepository.save(existingPassword);
+    } else {
+      await passwordRepository.save(
+        passwordRepository.create({ passwordHash, user: existingAdmin }),
+      );
+    }
+
+    if (existingAdmin.role?.name !== 'ADMIN') {
+      existingAdmin.role = adminRole;
+      await userRepository.save(existingAdmin);
+    }
+
+    console.log(
+      `Admin user ${adminEmail} already exists; password synced from .env`,
+    );
   }
 
   await app.close();
