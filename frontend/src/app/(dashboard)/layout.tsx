@@ -1,15 +1,12 @@
 'use client';
 
 import { Spin } from 'antd';
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
-import { clearSessionCookie } from '@/lib/auth-cookie';
 import { LOGIN_ROUTE } from '@/lib/constants';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const token = useAuthStore((state) => state.token);
   const expiresAt = useAuthStore((state) => state.expiresAt);
@@ -23,10 +20,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     if (!isSessionValid({ token, expiresAt })) {
       clearSession();
-      clearSessionCookie();
-      router.replace(LOGIN_ROUTE);
+      window.location.replace(LOGIN_ROUTE);
     }
-  }, [hasHydrated, token, expiresAt, clearSession, router]);
+  }, [hasHydrated, token, expiresAt, clearSession]);
 
   if (!sessionValid) {
     return (

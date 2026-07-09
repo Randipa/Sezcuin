@@ -32,9 +32,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: secret,
     });
   }
-  // Re-checked on every request
-  // next login attempt or once the existing token happens to expire.
+
   async validate(payload: JwtPayload): Promise<AuthenticatedUserPayload> {
+    // Re-checked on every request (rather than trusting the token payload)
+    // so a deactivated account is locked out immediately, not just at its
+    // next login attempt or once the existing token happens to expire.
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
       select: { id: true, isActive: true },
