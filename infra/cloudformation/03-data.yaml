@@ -1,0 +1,295 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Sezcuin - Data tier. Secrets Manager entries for the database password and
+  JWT signing key, an encrypted EFS file system for durable storage, and a
+  PostgreSQL container running on Fargate behind Cloud Map service discovery.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: sezcuin
+  PostgresImage:
+    Type: String
+    Default: postgres:15-alpine
+  PostgresDb:
+    Type: String
+    Default: sezcuin
+  PostgresUser:
+    Type: String
+    Default: sezcuin_app
+  PostgresCpu:
+    Type: String
+    Default: '512'
+  PostgresMemory:
+    Type: String
+    Default: '1024'
+  LogRetentionDays:
+    Type: Number
+    Default: 30
+
+Resources:
+  DbSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${ProjectName}/db'
+      Description: PostgreSQL credentials for Sezcuin.
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username":"${PostgresUser}"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludePunctuation: true
+
+  JwtSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${ProjectName}/jwt'
+      Description: JWT signing secret for the Sezcuin API.
+      GenerateSecretString:
+        GenerateStringKey: value
+        SecretStringTemplate: '{}'
+        PasswordLength: 64
+        ExcludePunctuation: true
+
+  AppTasksSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Shared security group for backend/frontend Fargate tasks.
+      VpcId:
+        Fn::ImportValue: !Sub '${ProjectName}-VpcId'
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound (image pulls, DB, Secrets Manager).
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-app-sg'
+
+  PostgresSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PostgreSQL Fargate task security group.
+      VpcId:
+        Fn::ImportValue: !Sub '${ProjectName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref AppTasksSecurityGroup
+          Description: Allow PostgreSQL only from application tasks.
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+          Description: Allow all outbound (image pulls, EFS).
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-postgres-sg'
+
+  EfsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EFS mount target security group.
+      VpcId:
+        Fn::ImportValue: !Sub '${ProjectName}-VpcId'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+          SourceSecurityGroupId: !Ref PostgresSecurityGroup
+          Description: Allow NFS only from the PostgreSQL task.
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-efs-sg'
+
+  FileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-postgres-efs'
+
+  MountTarget1:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId:
+        Fn::ImportValue: !Sub '${ProjectName}-PrivateSubnet1Id'
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  MountTarget2:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId:
+        Fn::ImportValue: !Sub '${ProjectName}-PrivateSubnet2Id'
+      SecurityGroups:
+        - !Ref EfsSecurityGroup
+
+  AccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref FileSystem
+      # postgres:15-alpine runs as uid/gid 70; the access point enforces this
+      # identity for all EFS operations so the data directory ownership check
+      # inside the container passes.
+      PosixUser:
+        Uid: '70'
+        Gid: '70'
+      RootDirectory:
+        Path: /postgres
+        CreationInfo:
+          OwnerUid: '70'
+          OwnerGid: '70'
+          Permissions: '0700'
+
+  PostgresLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/ecs/${ProjectName}/postgres'
+      RetentionInDays: !Ref LogRetentionDays
+
+  PostgresExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: read-db-secret
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref DbSecret
+
+  PostgresServiceDiscovery:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: postgres
+      NamespaceId:
+        Fn::ImportValue: !Sub '${ProjectName}-ServiceNamespaceId'
+      DnsConfig:
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - Type: A
+            TTL: 15
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  PostgresTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${ProjectName}-postgres'
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: !Ref PostgresCpu
+      Memory: !Ref PostgresMemory
+      ExecutionRoleArn: !GetAtt PostgresExecutionRole.Arn
+      Volumes:
+        - Name: postgres-data
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref FileSystem
+            TransitEncryption: ENABLED
+            AuthorizationConfig:
+              AccessPointId: !Ref AccessPoint
+              IAM: DISABLED
+      ContainerDefinitions:
+        - Name: postgres
+          Image: !Ref PostgresImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: 5432
+              Protocol: tcp
+          Environment:
+            - Name: POSTGRES_DB
+              Value: !Ref PostgresDb
+            - Name: POSTGRES_USER
+              Value: !Ref PostgresUser
+            - Name: PGDATA
+              Value: /var/lib/postgresql/data/pgdata
+          Secrets:
+            - Name: POSTGRES_PASSWORD
+              ValueFrom: !Sub '${DbSecret}:password::'
+          MountPoints:
+            - SourceVolume: postgres-data
+              ContainerPath: /var/lib/postgresql/data
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - !Sub 'pg_isready -U ${PostgresUser} -d ${PostgresDb}'
+            Interval: 15
+            Timeout: 5
+            Retries: 5
+            StartPeriod: 60
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref PostgresLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: postgres
+
+  PostgresService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - MountTarget1
+      - MountTarget2
+    Properties:
+      ServiceName: !Sub '${ProjectName}-postgres'
+      Cluster:
+        Fn::ImportValue: !Sub '${ProjectName}-ClusterArn'
+      TaskDefinition: !Ref PostgresTaskDefinition
+      LaunchType: FARGATE
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - Fn::ImportValue: !Sub '${ProjectName}-PrivateSubnet1Id'
+            - Fn::ImportValue: !Sub '${ProjectName}-PrivateSubnet2Id'
+          SecurityGroups:
+            - !Ref PostgresSecurityGroup
+      ServiceRegistries:
+        - RegistryArn: !GetAtt PostgresServiceDiscovery.Arn
+
+Outputs:
+  DbSecretArn:
+    Value: !Ref DbSecret
+    Export:
+      Name: !Sub '${ProjectName}-DbSecretArn'
+  JwtSecretArn:
+    Value: !Ref JwtSecret
+    Export:
+      Name: !Sub '${ProjectName}-JwtSecretArn'
+  AppTasksSecurityGroupId:
+    Value: !Ref AppTasksSecurityGroup
+    Export:
+      Name: !Sub '${ProjectName}-AppTasksSecurityGroupId'
+  PostgresHost:
+    Value: !Sub
+      - 'postgres.${Namespace}'
+      - Namespace:
+          Fn::ImportValue: !Sub '${ProjectName}-ServiceNamespaceName'
+    Export:
+      Name: !Sub '${ProjectName}-PostgresHost'
+  PostgresDbName:
+    Value: !Ref PostgresDb
+    Export:
+      Name: !Sub '${ProjectName}-PostgresDbName'
+  PostgresUserName:
+    Value: !Ref PostgresUser
+    Export:
+      Name: !Sub '${ProjectName}-PostgresUserName'

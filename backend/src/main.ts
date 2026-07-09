@@ -8,6 +8,11 @@ import { DocumentBuilder } from 'node_modules/@nestjs/swagger/dist/document-buil
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const globalPrefix = process.env.API_GLOBAL_PREFIX?.trim();
+  if (globalPrefix) {
+    app.setGlobalPrefix(globalPrefix);
+  }
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,11 +30,12 @@ async function bootstrap() {
     .addTag('sezcuin')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const swaggerPath = globalPrefix ? `${globalPrefix}/docs` : 'api';
+  SwaggerModule.setup(swaggerPath, app, document);
 
   //add cross origin resource sharing (CORS) to allow requests from the frontend
   app.enableCors({
-    origin: 'http://localhost:3002',
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3002',
     credentials: true,
   });
 
