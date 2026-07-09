@@ -22,6 +22,9 @@ export default function LoginPage() {
   const [sessionNotice, setSessionNotice] = useState<string | null>(null);
 
   useEffect(() => {
+    // Read once after mount: the notice lives in sessionStorage (client-only) and is
+    // consumed on read, so it cannot run during render without breaking hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessionNotice(consumeSessionEndedNotice());
   }, []);
 
