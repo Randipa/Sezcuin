@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
 import { LOGIN_ROUTE } from '@/lib/constants';
+import { SESSION_EXPIRED_MESSAGE, setSessionEndedNotice } from '@/lib/session-notice';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
@@ -19,7 +20,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return;
     }
     if (!isSessionValid({ token, expiresAt })) {
+      const hadActiveSession = Boolean(token);
       clearSession();
+      if (hadActiveSession) {
+        setSessionEndedNotice(SESSION_EXPIRED_MESSAGE);
+      }
       window.location.replace(LOGIN_ROUTE);
     }
   }, [hasHydrated, token, expiresAt, clearSession]);
