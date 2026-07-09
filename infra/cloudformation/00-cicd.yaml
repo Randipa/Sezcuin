@@ -132,8 +132,10 @@ Resources:
                 Action:
                   - ecr:CreateRepository
                   - ecr:DescribeRepositories
+                  - ecr:DescribeImages
                   - ecr:DeleteRepository
                   - ecr:PutLifecyclePolicy
+                  - ecr:GetLifecyclePolicy
                   - ecr:SetRepositoryPolicy
                   - ecr:TagResource
                 Resource: !Sub 'arn:aws:ecr:*:${AWS::AccountId}:repository/${ProjectName}/*'
