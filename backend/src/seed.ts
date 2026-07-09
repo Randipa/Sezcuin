@@ -75,7 +75,9 @@ async function seed() {
   });
 
   if (!existingAdmin) {
-    const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'Admin@12345';
+    const configuredPassword = process.env.SEED_ADMIN_PASSWORD;
+    const usingDefaultPassword = !configuredPassword;
+    const adminPassword = configuredPassword ?? 'Admin@12345';
 
     const admin = await userRepository.save(
       userRepository.create({
@@ -96,7 +98,9 @@ async function seed() {
 
     console.log(`Created ADMIN user ${adminEmail}`);
     console.log(
-      `Sign in with email "${adminEmail}" and the password from SEED_ADMIN_PASSWORD (default: "${adminPassword}"). Change it after first login.`,
+      usingDefaultPassword
+        ? 'SEED_ADMIN_PASSWORD was not set; a built-in default password was used. Sign in and change it immediately.'
+        : 'Sign in using the password from SEED_ADMIN_PASSWORD, then change it after first login.',
     );
   } else {
     console.log(`Admin user ${adminEmail} already exists, skipping`);
