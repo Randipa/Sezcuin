@@ -117,7 +117,9 @@ async function seed() {
       await userRepository.save(existingAdmin);
     }
 
-    console.log(`Admin user ${adminEmail} already exists; password synced from .env`);
+    console.log(
+      `Admin user ${adminEmail} already exists; password synced from .env`,
+    );
   }
 
   await app.close();

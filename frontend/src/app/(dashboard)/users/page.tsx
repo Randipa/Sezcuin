@@ -117,7 +117,9 @@ export default function UsersPage() {
           type="error"
           showIcon
           message="Failed to load users"
-          description={error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'}
+          description={
+            error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
+          }
         />
       ) : (
         <DataTable<UserRecord>
