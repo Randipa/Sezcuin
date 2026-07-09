@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RolesController } from './roles.controller';
 import { RolesService } from './roles.service';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/core/guards/roles.guard';
 import { PermissionsGuard } from 'src/core/guards/permissions.guard';
 
 describe('RolesController', () => {
@@ -14,8 +13,6 @@ describe('RolesController', () => {
       providers: [{ provide: RolesService, useValue: {} }],
     })
       .overrideGuard(JwtAuthGuard)
-      .useValue({ canActivate: () => true })
-      .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(PermissionsGuard)
       .useValue({ canActivate: () => true })

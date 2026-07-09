@@ -12,17 +12,14 @@ import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { JwtAuthGuard } from 'src/core/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/core/guards/roles.guard';
 import { PermissionsGuard } from 'src/core/guards/permissions.guard';
-import { Roles } from 'src/core/decorators/roles.decorator';
 import { Permissions } from 'src/core/decorators/permissions.decorator';
 import { ApiBearerAuth, ApiTags } from 'node_modules/@nestjs/swagger';
 
 @ApiTags('Roles')
 @ApiBearerAuth()
 @Controller('roles')
-@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles('ADMIN')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
