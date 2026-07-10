@@ -283,6 +283,9 @@ Resources:
       VpcId: !Ref VPC
       TargetType: ip
       HealthCheckPath: /api/health
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
       Matcher:
         HttpCode: '200'
 
@@ -295,6 +298,9 @@ Resources:
       VpcId: !Ref VPC
       TargetType: ip
       HealthCheckPath: /login
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
       Matcher:
         HttpCode: '200-399'
 
@@ -325,8 +331,8 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: !Sub '${EnvironmentName}-backend'
-      Cpu: '256'
-      Memory: '512'
+      Cpu: '512'
+      Memory: '1024'
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -369,13 +375,21 @@ Resources:
               awslogs-group: !Ref BackendLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: backend
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+            Interval: 30
+            Timeout: 5
+            Retries: 3
+            StartPeriod: 60
 
   FrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: !Sub '${EnvironmentName}-frontend'
-      Cpu: '256'
-      Memory: '512'
+      Cpu: '512'
+      Memory: '1024'
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
@@ -401,6 +415,14 @@ Resources:
               awslogs-group: !Ref FrontendLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: frontend
+          HealthCheck:
+            Command:
+              - CMD-SHELL
+              - node -e "fetch('http://127.0.0.1:3002/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+            Interval: 30
+            Timeout: 5
+            Retries: 3
+            StartPeriod: 90
 
   BackendService:
     Type: AWS::ECS::Service
@@ -410,6 +432,7 @@ Resources:
       Cluster: !Ref EcsCluster
       LaunchType: FARGATE
       DesiredCount: !Ref DesiredCount
+      HealthCheckGracePeriodSeconds: 180
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -432,6 +455,7 @@ Resources:
       Cluster: !Ref EcsCluster
       LaunchType: FARGATE
       DesiredCount: !Ref DesiredCount
+      HealthCheckGracePeriodSeconds: 180
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED

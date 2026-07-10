@@ -2,8 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './core/filters/http-exception.filter';
-import { SwaggerModule } from 'node_modules/@nestjs/swagger/dist/swagger-module';
-import { DocumentBuilder } from 'node_modules/@nestjs/swagger/dist/document-builder';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
