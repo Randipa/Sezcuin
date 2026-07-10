@@ -82,6 +82,7 @@ async function seed() {
         firstName: process.env.SEED_ADMIN_FIRST_NAME ?? 'System',
         lastName: process.env.SEED_ADMIN_LAST_NAME ?? 'Administrator',
         role: adminRole,
+        mustChangePassword: false,
       }),
     );
 

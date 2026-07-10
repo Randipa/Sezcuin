@@ -2,6 +2,7 @@
 
 import { Spin } from 'antd';
 import { useEffect } from 'react';
+import { PasswordResetModal } from '@/components/auth/password-reset-modal';
 import { AppShell } from '@/components/layout/app-shell';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
 import { LOGIN_ROUTE } from '@/lib/constants';
@@ -37,5 +38,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <>
+      <AppShell>{children}</AppShell>
+      <PasswordResetModal />
+    </>
+  );
 }

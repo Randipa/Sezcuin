@@ -5,3 +5,15 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
   const { data } = await apiClient.post<LoginResponse>('/auth/login', credentials);
   return data;
 }
+
+export async function acceptInvite(token: string): Promise<LoginResponse> {
+  const { data } = await apiClient.post<LoginResponse>('/auth/accept-invite', { token });
+  return data;
+}
+
+export async function changePassword(newPassword: string): Promise<{ message: string }> {
+  const { data } = await apiClient.post<{ message: string }>('/auth/change-password', {
+    newPassword,
+  });
+  return data;
+}
