@@ -74,7 +74,9 @@ export class AuthService {
       .getOne();
 
     if (!user?.inviteTokenExpiresAt || user.inviteTokenExpiresAt < new Date()) {
-      throw new BadRequestException('This invitation link is invalid or has expired.');
+      throw new BadRequestException(
+        'This invitation link is invalid or has expired.',
+      );
     }
 
     if (!user.isActive) {

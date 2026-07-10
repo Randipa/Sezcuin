@@ -42,7 +42,11 @@ export class MailService {
     return this.transporter;
   }
 
-  async sendInviteEmail({ to, firstName, inviteUrl }: SendInviteEmailParams): Promise<void> {
+  async sendInviteEmail({
+    to,
+    firstName,
+    inviteUrl,
+  }: SendInviteEmailParams): Promise<void> {
     const from =
       this.configService.get<string>('MAIL_FROM') ??
       this.configService.get<string>('SMTP_USER');
@@ -68,7 +72,9 @@ export class MailService {
 
     const host = this.configService.get<string>('SMTP_HOST');
     if (!host) {
-      this.logger.warn(`SMTP not configured — invite link for ${to}: ${inviteUrl}`);
+      this.logger.warn(
+        `SMTP not configured — invite link for ${to}: ${inviteUrl}`,
+      );
       return;
     }
 

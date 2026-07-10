@@ -101,55 +101,55 @@ export default function UsersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <Typography.Title level={3} className="mb-0!">
-            Users
-          </Typography.Title>
-          <Can permission={PERMISSIONS.USER_CREATE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
-              Create user
-            </Button>
-          </Can>
-        </div>
+      <div className="flex items-center justify-between">
+        <Typography.Title level={3} className="mb-0!">
+          Users
+        </Typography.Title>
+        <Can permission={PERMISSIONS.USER_CREATE}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
+            Create user
+          </Button>
+        </Can>
+      </div>
 
-        {isError ? (
-          <Alert
-            type="error"
-            showIcon
-            message="Failed to load users"
-            description={
-              error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
-            }
-          />
-        ) : (
-          <DataTable<UserRecord>
-            data={users}
-            loading={isLoading}
-            rowKey={(record) => record.id}
-            columns={columns}
-            searchPlaceholder="Search by name or email"
-            filterPredicate={(record, query) =>
-              `${record.firstName} ${record.lastName} ${record.email}`.toLowerCase().includes(query)
-            }
-            onRowClick={(record) => setDetailUser(record)}
-          />
-        )}
-
-        <UserDetailDrawer
-          open={!!detailUser}
-          user={detailUser}
-          onClose={() => setDetailUser(null)}
-          onEdit={openEditForm}
-          onDeleted={() => setDetailUser(null)}
+      {isError ? (
+        <Alert
+          type="error"
+          showIcon
+          message="Failed to load users"
+          description={
+            error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
+          }
         />
-
-        <UserFormDrawer
-          open={formState.open}
-          mode={formState.mode}
-          user={formState.user}
-          onClose={() => setFormState((state) => ({ ...state, open: false }))}
-          onSuccess={() => setFormState((state) => ({ ...state, open: false }))}
+      ) : (
+        <DataTable<UserRecord>
+          data={users}
+          loading={isLoading}
+          rowKey={(record) => record.id}
+          columns={columns}
+          searchPlaceholder="Search by name or email"
+          filterPredicate={(record, query) =>
+            `${record.firstName} ${record.lastName} ${record.email}`.toLowerCase().includes(query)
+          }
+          onRowClick={(record) => setDetailUser(record)}
         />
+      )}
+
+      <UserDetailDrawer
+        open={!!detailUser}
+        user={detailUser}
+        onClose={() => setDetailUser(null)}
+        onEdit={openEditForm}
+        onDeleted={() => setDetailUser(null)}
+      />
+
+      <UserFormDrawer
+        open={formState.open}
+        mode={formState.mode}
+        user={formState.user}
+        onClose={() => setFormState((state) => ({ ...state, open: false }))}
+        onSuccess={() => setFormState((state) => ({ ...state, open: false }))}
+      />
     </div>
   );
 }

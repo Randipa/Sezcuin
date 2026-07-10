@@ -36,9 +36,7 @@ function InviteHandler() {
         router.replace(DEFAULT_AUTHENTICATED_ROUTE);
       })
       .catch((error) => {
-        message.error(
-          error instanceof ApiError ? error.message : 'Unable to accept invitation',
-        );
+        message.error(error instanceof ApiError ? error.message : 'Unable to accept invitation');
         router.replace(LOGIN_ROUTE);
       });
   }, [hasHydrated, searchParams, setSession, router, message]);
