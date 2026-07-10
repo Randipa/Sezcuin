@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'infra/**'
-      - '.github/workflows/deploy-aws.yml'
+      - "backend/**"
+      - "frontend/**"
+      - "infra/**"
+      - ".github/workflows/deploy-aws.yml"
   workflow_dispatch:
   workflow_run:
-    workflows: ['Bootstrap AWS (ECS + ECR)']
+    workflows: ["Bootstrap AWS (ECS + ECR)"]
     types: [completed]
 
 concurrency:
@@ -94,7 +94,7 @@ jobs:
         run: |
           IMAGE="${{ steps.stack.outputs.frontend_repo }}"
           docker build -f infra/docker/Dockerfile.frontend \
-            --build-arg "NEXT_PUBLIC_API_URL=${{ steps.stack.outputs.api_url }}" \
+            --build-arg "NEXT_PUBLIC_API_URL=/api" \
             -t "${IMAGE}:latest" frontend
           docker push "${IMAGE}:latest"
 

@@ -1,4 +1,11 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+export const API_BASE_URL =
+  configuredApiUrl && configuredApiUrl.length > 0
+    ? configuredApiUrl.replace(/\/$/, '')
+    : process.env.NODE_ENV === 'production'
+      ? '/api'
+      : 'http://localhost:3000/api';
 
 export const AUTH_STORAGE_KEY = 'sezcuin-auth';
 
