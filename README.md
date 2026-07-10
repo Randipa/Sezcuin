@@ -16,7 +16,6 @@ Detailed instructions live in each package's README:
 
 - **[Backend setup →](./backend/README.md)** — API, PostgreSQL, `.env`, and first admin seed
 - **[Frontend setup →](./frontend/README.md)** — Next.js app, login, and local dev
-- **[AWS deploy (ECS + ECR) →](./infra/README.md)** — auto deploy on git push
 
 ## Local URLs
 
