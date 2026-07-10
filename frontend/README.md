@@ -29,7 +29,7 @@ The app runs on **http://localhost:3002** (the backend's CORS configuration only
 Copy `.env.local` (already present for local dev) and adjust if your API runs elsewhere:
 
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
 ## Signing in

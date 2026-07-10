@@ -1,0 +1,114 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'infra/**'
+      - '.github/workflows/deploy-aws.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aws-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-south-1
+  STACK_NAME: sezcuin-test
+
+jobs:
+  deploy:
+    name: Build, push, deploy ECS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Load stack outputs
+        id: stack
+        run: |
+          OUTPUTS="$(aws cloudformation describe-stacks \
+            --stack-name "${{ env.STACK_NAME }}" \
+            --query 'Stacks[0].Outputs' \
+            --output json)"
+
+          for key in backend_repo frontend_repo api_url app_url cluster backend_service frontend_service task_def subnets sg; do
+            case $key in
+              backend_repo)   out_key=BackendRepositoryUri ;;
+              frontend_repo)  out_key=FrontendRepositoryUri ;;
+              api_url)        out_key=ApiUrl ;;
+              app_url)        out_key=AppUrl ;;
+              cluster)        out_key=EcsClusterName ;;
+              backend_service) out_key=BackendServiceName ;;
+              frontend_service) out_key=FrontendServiceName ;;
+              task_def)       out_key=BackendTaskDefinitionArn ;;
+              subnets)        out_key=PublicSubnetIds ;;
+              sg)             out_key=EcsSecurityGroupId ;;
+            esac
+            echo "${key}=$(echo "$OUTPUTS" | jq -r ".[] | select(.OutputKey==\"${out_key}\") | .OutputValue")" >> "$GITHUB_OUTPUT"
+          done
+
+      - name: Build and push backend
+        run: |
+          IMAGE="${{ steps.stack.outputs.backend_repo }}"
+          docker build -f infra/docker/Dockerfile.backend -t "${IMAGE}:latest" backend
+          docker push "${IMAGE}:latest"
+
+      - name: Build and push frontend
+        run: |
+          IMAGE="${{ steps.stack.outputs.frontend_repo }}"
+          docker build -f infra/docker/Dockerfile.frontend \
+            --build-arg "NEXT_PUBLIC_API_URL=${{ steps.stack.outputs.api_url }}" \
+            -t "${IMAGE}:latest" frontend
+          docker push "${IMAGE}:latest"
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster "${{ steps.stack.outputs.cluster }}" \
+            --service "${{ steps.stack.outputs.backend_service }}" \
+            --desired-count 1 \
+            --force-new-deployment
+
+          aws ecs update-service \
+            --cluster "${{ steps.stack.outputs.cluster }}" \
+            --service "${{ steps.stack.outputs.frontend_service }}" \
+            --desired-count 1 \
+            --force-new-deployment
+
+          aws ecs wait services-stable \
+            --cluster "${{ steps.stack.outputs.cluster }}" \
+            --services \
+              "${{ steps.stack.outputs.backend_service }}" \
+              "${{ steps.stack.outputs.frontend_service }}"
+
+      - name: Seed admin account
+        run: |
+          TASK_ARN="$(aws ecs run-task \
+            --cluster "${{ steps.stack.outputs.cluster }}" \
+            --task-definition "${{ steps.stack.outputs.task_def }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ steps.stack.outputs.subnets }}],securityGroups=[${{ steps.stack.outputs.sg }}],assignPublicIp=ENABLED}" \
+            --overrides '{"containerOverrides":[{"name":"backend","command":["node","dist/seed.js"]}]}' \
+            --query 'tasks[0].taskArn' \
+            --output text)"
+
+          echo "Seed task: $TASK_ARN"
+          aws ecs wait tasks-stopped \
+            --cluster "${{ steps.stack.outputs.cluster }}" \
+            --tasks "$TASK_ARN"
+
+      - name: Summary
+        run: echo "Live at ${{ steps.stack.outputs.app_url }}"

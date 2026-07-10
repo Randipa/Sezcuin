@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "sezcuin-test"
+  },
+  {
+    "ParameterKey": "DbMasterUsername",
+    "ParameterValue": "sezcuin"
+  },
+  {
+    "ParameterKey": "DbMasterPassword",
+    "ParameterValue": "CHANGE_ME_DB_PASSWORD"
+  },
+  {
+    "ParameterKey": "JwtSecret",
+    "ParameterValue": "CHANGE_ME_JWT_SECRET_MIN_16_CHARS"
+  },
+  {
+    "ParameterKey": "SeedAdminEmail",
+    "ParameterValue": "admin@sezcuin.com"
+  },
+  {
+    "ParameterKey": "SeedAdminPassword",
+    "ParameterValue": "CHANGE_ME_ADMIN_PASSWORD"
+  },
+  {
+    "ParameterKey": "DesiredCount",
+    "ParameterValue": "0"
+  }
+]

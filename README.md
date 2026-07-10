@@ -16,6 +16,7 @@ Detailed instructions live in each package's README:
 
 - **[Backend setup →](./backend/README.md)** — API, PostgreSQL, `.env`, and first admin seed
 - **[Frontend setup →](./frontend/README.md)** — Next.js app, login, and local dev
+- **[AWS deploy (ECS + ECR) →](./infra/README.md)** — auto deploy on git push
 
 ## Local URLs
 
@@ -23,4 +24,4 @@ Detailed instructions live in each package's README:
 |---------|-----|
 | Frontend | http://localhost:3002 |
 | Backend API | http://localhost:3000 |
-| Swagger | http://localhost:3000/api |
+| Swagger | http://localhost:3000/api/docs |
