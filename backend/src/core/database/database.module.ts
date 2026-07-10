@@ -10,16 +10,23 @@ import { User } from 'src/users/entities/user.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('POSTGRES_HOST'),
-        port: configService.get<number>('POSTGRES_PORT'),
-        username: configService.get<string>('POSTGRES_USER'),
-        password: configService.get<string>('POSTGRES_PASSWORD'),
-        database: configService.get<string>('POSTGRES_DB'),
-        entities: [User, Password, Role],
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const useSsl =
+          configService.get<string>('POSTGRES_SSL') === 'true' ||
+          configService.get<string>('NODE_ENV') === 'production';
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('POSTGRES_HOST'),
+          port: configService.get<number>('POSTGRES_PORT'),
+          username: configService.get<string>('POSTGRES_USER'),
+          password: configService.get<string>('POSTGRES_PASSWORD'),
+          database: configService.get<string>('POSTGRES_DB'),
+          entities: [User, Password, Role],
+          synchronize: true,
+          ssl: useSsl ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
   ],
 })
