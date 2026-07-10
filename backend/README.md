@@ -35,7 +35,9 @@ POSTGRES_DB=sezcuin
 JWT_SECRET=change-me
 ```
 
-CORS is restricted to `http://localhost:3002` (the frontend's dev port) in `src/main.ts`.
+CORS is restricted to `http://localhost:3002` (the frontend's dev port) via the `FRONTEND_URL` env var in `src/main.ts`.
+
+All REST routes are served under the `/api` prefix (e.g. `/api/auth/login`). Swagger docs live at `/api/docs`.
 
 ## Bootstrapping the first admin account
 
