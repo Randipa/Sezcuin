@@ -101,23 +101,42 @@ jobs:
       - name: Deploy to ECS
         if: steps.infra.outputs.ready == 'true'
         run: |
-          aws ecs update-service \
-            --cluster "${{ steps.stack.outputs.cluster }}" \
-            --service "${{ steps.stack.outputs.backend_service }}" \
-            --desired-count 1 \
-            --force-new-deployment
+          CLUSTER="${{ steps.stack.outputs.cluster }}"
+          BACKEND="${{ steps.stack.outputs.backend_service }}"
+          FRONTEND="${{ steps.stack.outputs.frontend_service }}"
 
-          aws ecs update-service \
-            --cluster "${{ steps.stack.outputs.cluster }}" \
-            --service "${{ steps.stack.outputs.frontend_service }}" \
-            --desired-count 1 \
-            --force-new-deployment
+          aws ecs update-service --cluster "$CLUSTER" --service "$BACKEND" \
+            --desired-count 1 --force-new-deployment
+          aws ecs update-service --cluster "$CLUSTER" --service "$FRONTEND" \
+            --desired-count 1 --force-new-deployment
 
-          aws ecs wait services-stable \
-            --cluster "${{ steps.stack.outputs.cluster }}" \
-            --services \
-              "${{ steps.stack.outputs.backend_service }}" \
-              "${{ steps.stack.outputs.frontend_service }}"
+          echo "Waiting for backend..."
+          if ! aws ecs wait services-stable --cluster "$CLUSTER" --services "$BACKEND"; then
+            echo "::error::Backend service failed to stabilize"
+            TASK="$(aws ecs list-tasks --cluster "$CLUSTER" --service-name "$BACKEND" \
+              --desired-status STOPPED --query 'taskArns[0]' --output text)"
+            if [[ "$TASK" != "None" && -n "$TASK" ]]; then
+              aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK" \
+                --query 'tasks[0].{reason:stoppedReason,exit:containers[0].exitCode,reason2:containers[0].reason}' \
+                --output json
+            fi
+            aws logs tail "/ecs/sezcuin-test/backend" --since 30m || true
+            exit 1
+          fi
+
+          echo "Waiting for frontend..."
+          if ! aws ecs wait services-stable --cluster "$CLUSTER" --services "$FRONTEND"; then
+            echo "::error::Frontend service failed to stabilize"
+            TASK="$(aws ecs list-tasks --cluster "$CLUSTER" --service-name "$FRONTEND" \
+              --desired-status STOPPED --query 'taskArns[0]' --output text)"
+            if [[ "$TASK" != "None" && -n "$TASK" ]]; then
+              aws ecs describe-tasks --cluster "$CLUSTER" --tasks "$TASK" \
+                --query 'tasks[0].{reason:stoppedReason,exit:containers[0].exitCode,reason2:containers[0].reason}' \
+                --output json
+            fi
+            aws logs tail "/ecs/sezcuin-test/frontend" --since 30m || true
+            exit 1
+          fi
 
       - name: Seed admin account
         if: steps.infra.outputs.ready == 'true'

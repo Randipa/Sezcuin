@@ -40,6 +40,16 @@
       }
     },
     {
+      "Sid": "ReadLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:GetLogEvents",
+        "logs:FilterLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "*"
+    },
+    {
       "Sid": "ReadStack",
       "Effect": "Allow",
       "Action": "cloudformation:DescribeStacks",
