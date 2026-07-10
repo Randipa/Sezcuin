@@ -360,6 +360,8 @@ Resources:
               Value: !Ref DbMasterPassword
             - Name: POSTGRES_DB
               Value: sezcuin
+            - Name: POSTGRES_SSL
+              Value: 'true'
             - Name: FRONTEND_URL
               Value: !Sub 'http://${ApplicationLoadBalancer.DNSName}'
           Secrets:
