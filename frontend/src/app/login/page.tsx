@@ -20,6 +20,7 @@ export default function LoginPage() {
   const token = useAuthStore((state) => state.token);
   const expiresAt = useAuthStore((state) => state.expiresAt);
   const [sessionNotice, setSessionNotice] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     const notice = consumeSessionEndedNotice();
@@ -41,16 +42,20 @@ export default function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (response) => {
+      setLoginError(null);
       setSession(response);
-      router.replace(DEFAULT_AUTHENTICATED_ROUTE);
+      window.location.assign(DEFAULT_AUTHENTICATED_ROUTE);
     },
     onError: (error) => {
       const apiError = error instanceof ApiError ? error : null;
-      message.error(apiError?.message ?? 'Unable to sign in. Please try again.');
+      const errorMessage = apiError?.message ?? 'Unable to sign in. Please try again.';
+      setLoginError(errorMessage);
+      message.error(errorMessage);
     },
   });
 
   const handleFinish = (values: LoginCredentials) => {
+    setLoginError(null);
     mutation.mutate(values);
   };
 
@@ -63,6 +68,17 @@ export default function LoginPage() {
           </Typography.Title>
           <Typography.Text type="secondary">Sign in to manage your workspace</Typography.Text>
         </div>
+
+        {loginError && (
+          <Alert
+            className="mb-4"
+            type="error"
+            showIcon
+            message={loginError}
+            closable
+            onClose={() => setLoginError(null)}
+          />
+        )}
 
         {sessionNotice && (
           <Alert
