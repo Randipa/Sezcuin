@@ -15,7 +15,6 @@ Parameters:
     NoEcho: true
     MinLength: 8
     MaxLength: 128
-    AllowedPattern: '^[^/@\"\\\' ]+$'
 
   JwtSecret:
     Type: String
