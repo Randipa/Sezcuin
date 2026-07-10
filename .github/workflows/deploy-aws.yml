@@ -9,6 +9,9 @@ on:
       - 'infra/**'
       - '.github/workflows/deploy-aws.yml'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Bootstrap AWS (ECS + ECR)']
+    types: [completed]
 
 concurrency:
   group: deploy-aws-${{ github.ref }}
@@ -22,6 +25,10 @@ jobs:
   deploy:
     name: Build, push, deploy ECS
     runs-on: ubuntu-latest
+    # Skip auto-deploy if bootstrap workflow failed
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -33,10 +40,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Check infrastructure exists
+        id: infra
+        run: |
+          if aws cloudformation describe-stacks \
+            --stack-name "${{ env.STACK_NAME }}" \
+            --query 'Stacks[0].StackStatus' \
+            --output text 2>/dev/null | grep -qE 'CREATE_COMPLETE|UPDATE_COMPLETE'; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Deploy skipped::Run **Bootstrap AWS (ECS + ECR)** workflow first. Infrastructure stack not found yet."
+          fi
+
       - name: Login to Amazon ECR
+        if: steps.infra.outputs.ready == 'true'
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Load stack outputs
+        if: steps.infra.outputs.ready == 'true'
         id: stack
         run: |
           OUTPUTS="$(aws cloudformation describe-stacks \
@@ -61,12 +83,14 @@ jobs:
           done
 
       - name: Build and push backend
+        if: steps.infra.outputs.ready == 'true'
         run: |
           IMAGE="${{ steps.stack.outputs.backend_repo }}"
           docker build -f infra/docker/Dockerfile.backend -t "${IMAGE}:latest" backend
           docker push "${IMAGE}:latest"
 
       - name: Build and push frontend
+        if: steps.infra.outputs.ready == 'true'
         run: |
           IMAGE="${{ steps.stack.outputs.frontend_repo }}"
           docker build -f infra/docker/Dockerfile.frontend \
@@ -75,6 +99,7 @@ jobs:
           docker push "${IMAGE}:latest"
 
       - name: Deploy to ECS
+        if: steps.infra.outputs.ready == 'true'
         run: |
           aws ecs update-service \
             --cluster "${{ steps.stack.outputs.cluster }}" \
@@ -95,6 +120,8 @@ jobs:
               "${{ steps.stack.outputs.frontend_service }}"
 
       - name: Seed admin account
+        if: steps.infra.outputs.ready == 'true'
+        continue-on-error: true
         run: |
           TASK_ARN="$(aws ecs run-task \
             --cluster "${{ steps.stack.outputs.cluster }}" \
@@ -111,4 +138,5 @@ jobs:
             --tasks "$TASK_ARN"
 
       - name: Summary
+        if: steps.infra.outputs.ready == 'true'
         run: echo "Live at ${{ steps.stack.outputs.app_url }}"
