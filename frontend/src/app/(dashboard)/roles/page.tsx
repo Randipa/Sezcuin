@@ -92,42 +92,42 @@ export default function RolesPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Typography.Title level={3} className="mb-0!">
-          Roles
-        </Typography.Title>
-        <Can permission={PERMISSIONS.ROLE_CREATE}>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
-            Create role
-          </Button>
-        </Can>
-      </div>
+        <div className="flex items-center justify-between">
+          <Typography.Title level={3} className="mb-0!">
+            Roles
+          </Typography.Title>
+          <Can permission={PERMISSIONS.ROLE_CREATE}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
+              Create role
+            </Button>
+          </Can>
+        </div>
 
-      <DataTable<Role>
-        data={roles}
-        loading={isLoading}
-        rowKey={(record) => record.id}
-        columns={columns}
-        searchPlaceholder="Search by role name"
-        filterPredicate={(record, query) => record.name.toLowerCase().includes(query)}
-        onRowClick={(record) => setDetailRole(record)}
-      />
+        <DataTable<Role>
+          data={roles}
+          loading={isLoading}
+          rowKey={(record) => record.id}
+          columns={columns}
+          searchPlaceholder="Search by role name"
+          filterPredicate={(record, query) => record.name.toLowerCase().includes(query)}
+          onRowClick={(record) => setDetailRole(record)}
+        />
 
-      <RoleDetailDrawer
-        open={!!detailRole}
-        role={detailRole}
-        onClose={() => setDetailRole(null)}
-        onEdit={openEditForm}
-        onDeleted={() => setDetailRole(null)}
-      />
+        <RoleDetailDrawer
+          open={!!detailRole}
+          role={detailRole}
+          onClose={() => setDetailRole(null)}
+          onEdit={openEditForm}
+          onDeleted={() => setDetailRole(null)}
+        />
 
-      <RoleFormDrawer
-        open={formState.open}
-        mode={formState.mode}
-        role={formState.role}
-        onClose={() => setFormState((state) => ({ ...state, open: false }))}
-        onSuccess={() => setFormState((state) => ({ ...state, open: false }))}
-      />
+        <RoleFormDrawer
+          open={formState.open}
+          mode={formState.mode}
+          role={formState.role}
+          onClose={() => setFormState((state) => ({ ...state, open: false }))}
+          onSuccess={() => setFormState((state) => ({ ...state, open: false }))}
+        />
     </div>
   );
 }

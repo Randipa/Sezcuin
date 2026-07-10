@@ -13,6 +13,7 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   access_token: string;
+  mustChangePassword: boolean;
   user: AuthenticatedUser;
 }
 

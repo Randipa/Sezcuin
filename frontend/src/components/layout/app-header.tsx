@@ -1,7 +1,7 @@
 'use client';
 
 import { LogoutOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Layout, Space, Typography } from 'antd';
+import { Avatar, Button, Dropdown, Layout, Space, Tag, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useCurrentUser } from '@/features/auth/auth-store';
@@ -24,7 +24,11 @@ export function AppHeader({ onToggleMobileNav }: AppHeaderProps) {
   const menuItems: MenuProps['items'] = [
     {
       key: 'role',
-      label: <span className="text-gray-400">Role: {user?.role}</span>,
+      label: (
+        <span className="flex items-center gap-2 text-gray-500">
+          Role <Tag color="blue">{user?.role}</Tag>
+        </span>
+      ),
       disabled: true,
     },
     { type: 'divider' },

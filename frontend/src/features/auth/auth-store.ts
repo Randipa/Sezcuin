@@ -10,9 +10,11 @@ interface AuthState {
   token: string | null;
   user: AuthenticatedUser | null;
   permissions: string[];
+  mustChangePassword: boolean;
   expiresAt: number | null;
   hasHydrated: boolean;
   setSession: (response: LoginResponse) => void;
+  clearMustChangePassword: () => void;
   clearSession: () => void;
   setHasHydrated: (value: boolean) => void;
 }
@@ -23,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       permissions: [],
+      mustChangePassword: false,
       expiresAt: null,
       hasHydrated: false,
       setSession: (response) => {
@@ -31,12 +34,20 @@ export const useAuthStore = create<AuthState>()(
           token: response.access_token,
           user: response.user,
           permissions: decoded?.permissions ?? [],
+          mustChangePassword: response.mustChangePassword,
           expiresAt: decoded ? decoded.exp * 1000 : null,
         });
         markSessionCookie();
       },
+      clearMustChangePassword: () => set({ mustChangePassword: false }),
       clearSession: () => {
-        set({ token: null, user: null, permissions: [], expiresAt: null });
+        set({
+          token: null,
+          user: null,
+          permissions: [],
+          mustChangePassword: false,
+          expiresAt: null,
+        });
         clearSessionCookie();
       },
       setHasHydrated: (value) => set({ hasHydrated: value }),
@@ -48,6 +59,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         user: state.user,
         permissions: state.permissions,
+        mustChangePassword: state.mustChangePassword,
         expiresAt: state.expiresAt,
       }),
       onRehydrateStorage: () => (state) => {
@@ -80,4 +92,8 @@ export function useHasPermission(required: Permission | Permission[]): boolean {
 
 export function useCurrentUser() {
   return useAuthStore((state) => state.user);
+}
+
+export function useMustChangePassword() {
+  return useAuthStore((state) => state.mustChangePassword);
 }

@@ -6,8 +6,12 @@ export const usersKeys = {
   all: ['users'] as const,
 };
 
-export function useUsersQuery() {
-  return useQuery({ queryKey: usersKeys.all, queryFn: listUsers });
+export function useUsersQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: usersKeys.all,
+    queryFn: listUsers,
+    enabled: options?.enabled,
+  });
 }
 
 export function useCreateUserMutation() {

@@ -6,8 +6,12 @@ export const rolesKeys = {
   all: ['roles'] as const,
 };
 
-export function useRolesQuery() {
-  return useQuery({ queryKey: rolesKeys.all, queryFn: listRoles });
+export function useRolesQuery(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: rolesKeys.all,
+    queryFn: listRoles,
+    enabled: options?.enabled,
+  });
 }
 
 export function useCreateRoleMutation() {

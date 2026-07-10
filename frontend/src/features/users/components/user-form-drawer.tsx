@@ -12,7 +12,6 @@ interface UserFormValues {
   email: string;
   firstName: string;
   lastName: string;
-  password?: string;
   roleName: string;
   isActive: boolean;
 }
@@ -59,12 +58,11 @@ export function UserFormDrawer({ open, mode, user, onClose, onSuccess }: UserFor
           email: values.email,
           firstName: values.firstName,
           lastName: values.lastName,
-          password: values.password!,
           roleName: values.roleName,
         },
         {
           onSuccess: () => {
-            message.success('User created successfully');
+            message.success('User created — invitation email sent');
             onSuccess();
           },
           onError: (error) => {
@@ -138,19 +136,6 @@ export function UserFormDrawer({ open, mode, user, onClose, onSuccess }: UserFor
           <Input placeholder="Doe" />
         </Form.Item>
       </div>
-
-      {mode === 'create' && (
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[
-            { required: true, message: 'Password is required' },
-            { min: 8, message: 'Must be at least 8 characters' },
-          ]}
-        >
-          <Input.Password placeholder="At least 8 characters" />
-        </Form.Item>
-      )}
 
       <Form.Item
         name="roleName"
