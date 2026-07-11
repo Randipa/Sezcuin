@@ -2,12 +2,13 @@
 
 import { Button, Result } from 'antd';
 import { useRouter } from 'next/navigation';
+import { AuthShell } from '@/components/common/auth-shell';
 
 export default function ForbiddenPage() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <AuthShell subtitle="Access restricted" maxWidthClassName="max-w-md">
       <Result
         status="403"
         title="403"
@@ -18,6 +19,6 @@ export default function ForbiddenPage() {
           </Button>
         }
       />
-    </div>
+    </AuthShell>
   );
 }

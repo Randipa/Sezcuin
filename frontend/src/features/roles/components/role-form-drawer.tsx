@@ -1,10 +1,10 @@
 'use client';
 
-import { App, Checkbox, Divider, Form, Input, Typography } from 'antd';
+import { App, Form, Input, Typography } from 'antd';
 import { useEffect } from 'react';
 import { FormDrawer } from '@/components/common/form-drawer';
 import { ApiError } from '@/lib/api/error';
-import { PERMISSION_GROUPS } from '@/lib/permissions';
+import { PermissionPicker } from './permission-picker';
 import { useCreateRoleMutation, useUpdateRoleMutation } from '../hooks';
 import type { Role } from '../types';
 
@@ -28,6 +28,7 @@ export function RoleFormDrawer({ open, mode, role, onClose, onSuccess }: RoleFor
   const updateMutation = useUpdateRoleMutation();
 
   const submitting = createMutation.isPending || updateMutation.isPending;
+  const selectedCount = Form.useWatch('permissions', form)?.length ?? 0;
 
   useEffect(() => {
     if (!open) {
@@ -42,8 +43,13 @@ export function RoleFormDrawer({ open, mode, role, onClose, onSuccess }: RoleFor
   }, [open, mode, role, form]);
 
   const handleFinish = (values: RoleFormValues) => {
+    const payload = {
+      ...values,
+      name: values.name.trim().toUpperCase(),
+    };
+
     if (mode === 'create') {
-      createMutation.mutate(values, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           message.success('Role created successfully');
           onSuccess();
@@ -60,7 +66,7 @@ export function RoleFormDrawer({ open, mode, role, onClose, onSuccess }: RoleFor
     }
 
     updateMutation.mutate(
-      { id: role.id, input: values },
+      { id: role.id, input: payload },
       {
         onSuccess: () => {
           message.success('Role updated successfully');
@@ -82,6 +88,7 @@ export function RoleFormDrawer({ open, mode, role, onClose, onSuccess }: RoleFor
       onFinish={handleFinish}
       submitting={submitting}
       submitLabel={mode === 'create' ? 'Create' : 'Save changes'}
+      drawerSize={560}
     >
       <Form.Item
         name="name"
@@ -89,29 +96,30 @@ export function RoleFormDrawer({ open, mode, role, onClose, onSuccess }: RoleFor
         extra="Stored in upper case, e.g. MANAGER"
         rules={[{ required: true, message: 'Role name is required' }]}
       >
-        <Input placeholder="MANAGER" />
+        <Input
+          placeholder="MANAGER"
+          onBlur={(event) => {
+            const upper = event.target.value.trim().toUpperCase();
+            if (upper !== event.target.value) {
+              form.setFieldValue('name', upper);
+            }
+          }}
+        />
       </Form.Item>
 
       <Form.Item
         name="permissions"
-        label="Permissions"
+        label={
+          <div className="flex items-center justify-between gap-2">
+            <span>Permissions</span>
+            <Typography.Text type="secondary" className="text-xs font-normal">
+              {selectedCount} selected
+            </Typography.Text>
+          </div>
+        }
         rules={[{ required: true, message: 'Select at least one permission' }]}
       >
-        <Checkbox.Group className="w-full">
-          {PERMISSION_GROUPS.map((group) => (
-            <div key={group.label} className="mb-3 w-full">
-              <Typography.Text strong>{group.label}</Typography.Text>
-              <Divider className="my-2!" />
-              <div className="flex flex-col gap-2">
-                {group.permissions.map((permission) => (
-                  <Checkbox key={permission.value} value={permission.value}>
-                    {permission.label}
-                  </Checkbox>
-                ))}
-              </div>
-            </div>
-          ))}
-        </Checkbox.Group>
+        <PermissionPicker />
       </Form.Item>
     </FormDrawer>
   );

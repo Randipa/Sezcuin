@@ -2,6 +2,7 @@
 
 import { Card, Skeleton, Statistic } from 'antd';
 import type { ReactNode } from 'react';
+import { THEME_COLORS } from '@/lib/theme';
 
 interface StatCardProps {
   title: string;
@@ -26,8 +27,8 @@ export function StatCard({ title, value, icon, loading, accentColor, suffix }: S
         <div
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg"
           style={{
-            backgroundColor: `${accentColor ?? '#4f46e5'}1a`,
-            color: accentColor ?? '#4f46e5',
+            backgroundColor: `${accentColor ?? THEME_COLORS.primary}1a`,
+            color: accentColor ?? THEME_COLORS.primary,
           }}
         >
           {icon}

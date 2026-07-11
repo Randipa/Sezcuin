@@ -1,3 +1,5 @@
+import { ENTITY_ACCENT_COLORS, THEME_COLORS } from '@/lib/theme';
+
 export const PERMISSIONS = {
   USER_READ: 'user:read',
   USER_CREATE: 'user:create',
@@ -36,6 +38,55 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
     ],
   },
 ];
+
+export const PERMISSION_MODULE_COLORS: Record<string, string> = {
+  Users: ENTITY_ACCENT_COLORS.users,
+  Roles: ENTITY_ACCENT_COLORS.roles,
+};
+
+const PERMISSION_LABEL_LOOKUP = new Map(
+  PERMISSION_GROUPS.flatMap((group) =>
+    group.permissions.map((permission) => [permission.value, permission.label] as const),
+  ),
+);
+
+export function getPermissionLabel(permission: string): string {
+  return PERMISSION_LABEL_LOOKUP.get(permission as Permission) ?? permission;
+}
+
+export interface GroupedPermissions {
+  label: string;
+  color: string;
+  permissions: { value: string; label: string }[];
+}
+
+export function groupPermissionsByModule(permissions: readonly string[]): GroupedPermissions[] {
+  const owned = new Set(permissions);
+
+  return PERMISSION_GROUPS.map((group) => ({
+    label: group.label,
+    color: PERMISSION_MODULE_COLORS[group.label] ?? THEME_COLORS.neutral,
+    permissions: group.permissions
+      .filter((permission) => owned.has(permission.value))
+      .map((permission) => ({
+        value: permission.value,
+        label: permission.label,
+      })),
+  })).filter((group) => group.permissions.length > 0);
+}
+
+export function getModuleAccessSummary(
+  permissions: readonly string[],
+): { label: string; color: string; selected: number; total: number }[] {
+  const owned = new Set(permissions);
+
+  return PERMISSION_GROUPS.map((group) => ({
+    label: group.label,
+    color: PERMISSION_MODULE_COLORS[group.label] ?? THEME_COLORS.neutral,
+    selected: group.permissions.filter((permission) => owned.has(permission.value)).length,
+    total: group.permissions.length,
+  })).filter((summary) => summary.selected > 0);
+}
 
 function normalize(permission: string): string {
   return permission.toUpperCase();

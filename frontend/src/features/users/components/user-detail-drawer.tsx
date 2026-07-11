@@ -1,12 +1,13 @@
 'use client';
 
-import { EditOutlined } from '@ant-design/icons';
-import { App, Button, Descriptions, Space, Tag } from 'antd';
+import { EditOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { App, Avatar, Button, Space, Tag, Typography } from 'antd';
 import { Can } from '@/components/common/can';
 import { ConfirmDeleteButton } from '@/components/common/confirm-delete-button';
 import { DetailDrawer } from '@/components/common/detail-drawer';
 import { ApiError } from '@/lib/api/error';
 import { PERMISSIONS } from '@/lib/permissions';
+import { ENTITY_ACCENT_COLORS } from '@/lib/theme';
 import { useDeleteUserMutation } from '../hooks';
 import type { UserRecord } from '../types';
 
@@ -53,8 +54,8 @@ export function UserDetailDrawer({
         <Space>
           <Can permission={PERMISSIONS.USER_DELETE}>
             <ConfirmDeleteButton
-              title="Delete this user?"
-              description="This action cannot be undone."
+              title={`Delete ${user.firstName} ${user.lastName}?`}
+              description="They'll lose access right away, and this can't be undone."
               onConfirm={handleDelete}
               loading={deleteMutation.isPending}
               buttonProps={{ size: 'small' }}
@@ -68,20 +69,55 @@ export function UserDetailDrawer({
         </Space>
       }
     >
-      <Descriptions column={1} bordered size="small">
-        <Descriptions.Item label="Full name">
-          {user.firstName} {user.lastName}
-        </Descriptions.Item>
-        <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-        <Descriptions.Item label="Role">
-          <Tag color="blue">{user.role.name}</Tag>
-        </Descriptions.Item>
-        <Descriptions.Item label="Status">
-          <Tag color={user.isActive ? 'green' : 'default'}>
+      <div
+        className="mb-5 flex items-center gap-3 rounded-lg border p-4"
+        style={{
+          borderColor: `${ENTITY_ACCENT_COLORS.users}26`,
+          backgroundColor: `${ENTITY_ACCENT_COLORS.users}0d`,
+        }}
+      >
+        <Avatar
+          size={44}
+          icon={<UserOutlined />}
+          style={{
+            backgroundColor: `${ENTITY_ACCENT_COLORS.users}1a`,
+            color: ENTITY_ACCENT_COLORS.users,
+          }}
+        />
+        <div className="min-w-0">
+          <Typography.Text strong className="block">
+            {user.firstName} {user.lastName}
+          </Typography.Text>
+          <Typography.Text type="secondary" className="flex items-center gap-1.5 text-sm">
+            <MailOutlined /> {user.email}
+          </Typography.Text>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+          <Typography.Text
+            type="secondary"
+            className="mb-1.5 block text-xs tracking-wide uppercase"
+          >
+            Role
+          </Typography.Text>
+          <Tag color="blue" className="m-0!">
+            {user.role.name}
+          </Tag>
+        </div>
+        <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+          <Typography.Text
+            type="secondary"
+            className="mb-1.5 block text-xs tracking-wide uppercase"
+          >
+            Status
+          </Typography.Text>
+          <Tag color={user.isActive ? 'green' : 'default'} className="m-0!">
             {user.isActive ? 'Active' : 'Inactive'}
           </Tag>
-        </Descriptions.Item>
-      </Descriptions>
+        </div>
+      </div>
     </DetailDrawer>
   );
 }

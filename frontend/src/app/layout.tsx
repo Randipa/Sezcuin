@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Sezcuin Admin',
+  title: 'Sezcuin',
   description: 'User and role management console for the Sezcuin platform',
 };
 
