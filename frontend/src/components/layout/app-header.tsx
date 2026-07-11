@@ -36,6 +36,7 @@ export function AppHeader({ onToggleMobileNav }: AppHeaderProps) {
       key: 'logout',
       label: 'Log out',
       icon: <LogoutOutlined />,
+      danger: true,
       onClick: handleLogout,
     },
   ];

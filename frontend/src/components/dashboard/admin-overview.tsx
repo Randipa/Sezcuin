@@ -14,6 +14,7 @@ import { useUsersQuery } from '@/features/users/hooks';
 import { useRolesQuery } from '@/features/roles/hooks';
 import { useHasPermission } from '@/features/auth/auth-store';
 import { PERMISSIONS } from '@/lib/permissions';
+import { ENTITY_ACCENT_COLORS, THEME_COLORS } from '@/lib/theme';
 
 interface ShortcutCardProps {
   title: string;
@@ -67,7 +68,7 @@ export function AdminOverview() {
               value={users?.length ?? 0}
               loading={usersLoading}
               icon={<TeamOutlined />}
-              accentColor="#4f46e5"
+              accentColor={ENTITY_ACCENT_COLORS.users}
             />
           </Col>
           <Col xs={24} sm={12} lg={8}>
@@ -76,7 +77,7 @@ export function AdminOverview() {
               value={activeUsersCount}
               loading={usersLoading}
               icon={<CheckCircleOutlined />}
-              accentColor="#16a34a"
+              accentColor={THEME_COLORS.success}
             />
           </Col>
         </Can>
@@ -87,7 +88,7 @@ export function AdminOverview() {
               value={roles?.length ?? 0}
               loading={rolesLoading}
               icon={<SafetyCertificateOutlined />}
-              accentColor="#d97706"
+              accentColor={ENTITY_ACCENT_COLORS.roles}
             />
           </Col>
         </Can>
@@ -104,7 +105,7 @@ export function AdminOverview() {
                 title="User management"
                 description="View, create and manage user accounts."
                 icon={<TeamOutlined />}
-                accentColor="#4f46e5"
+                accentColor={ENTITY_ACCENT_COLORS.users}
                 onClick={() => router.push('/users')}
               />
             </Col>
@@ -115,7 +116,7 @@ export function AdminOverview() {
                 title="Role management"
                 description="Define roles and fine-tune permissions."
                 icon={<SafetyCertificateOutlined />}
-                accentColor="#d97706"
+                accentColor={ENTITY_ACCENT_COLORS.roles}
                 onClick={() => router.push('/roles')}
               />
             </Col>

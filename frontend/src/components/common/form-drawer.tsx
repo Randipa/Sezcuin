@@ -14,6 +14,7 @@ interface FormDrawerProps<Values> {
   onFinish: (values: Values) => void;
   submitting?: boolean;
   submitLabel?: string;
+  drawerSize?: number | '100%';
   children: ReactNode;
 }
 
@@ -25,10 +26,11 @@ export function FormDrawer<Values>({
   onFinish,
   submitting,
   submitLabel = 'Save',
+  drawerSize,
   children,
 }: FormDrawerProps<Values>) {
   const screens = useBreakpoint();
-  const size = screens.sm ? 480 : '100%';
+  const size = drawerSize ?? (screens.sm ? 480 : '100%');
 
   return (
     <Drawer

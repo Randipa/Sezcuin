@@ -1,8 +1,9 @@
 'use client';
 
-import { App, Spin } from 'antd';
+import { App, Spin, Typography } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
+import { AuthShell } from '@/components/common/auth-shell';
 import { acceptInvite } from '@/features/auth/auth-api';
 import { useAuthStore } from '@/features/auth/auth-store';
 import { DEFAULT_AUTHENTICATED_ROUTE, LOGIN_ROUTE } from '@/lib/constants';
@@ -42,9 +43,12 @@ function InviteHandler() {
   }, [hasHydrated, searchParams, setSession, router, message]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Spin size="large" description="Signing you in…" />
-    </div>
+    <AuthShell subtitle="Setting up your account">
+      <div className="flex flex-col items-center gap-3 py-6">
+        <Spin size="large" />
+        <Typography.Text type="secondary">Signing you in…</Typography.Text>
+      </div>
+    </AuthShell>
   );
 }
 
@@ -52,9 +56,11 @@ export default function InvitePage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <Spin size="large" />
-        </div>
+        <AuthShell subtitle="Setting up your account">
+          <div className="flex items-center justify-center py-6">
+            <Spin size="large" />
+          </div>
+        </AuthShell>
       }
     >
       <InviteHandler />

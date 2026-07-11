@@ -1,17 +1,18 @@
 'use client';
 
+import { SafetyCertificateOutlined } from '@ant-design/icons';
 import { Drawer, Grid, Layout, Typography } from 'antd';
 import { useState, type ReactNode } from 'react';
+import { THEME_COLORS } from '@/lib/theme';
 import { AppHeader } from './app-header';
 import { SidebarMenu } from './sidebar-menu';
 
 const { useBreakpoint } = Grid;
 
 const BRAND = (
-  <div className="flex h-16 items-center justify-center border-b border-white/10 px-4">
-    <Typography.Text className="text-base! font-semibold! text-white!">
-      Sezcuin Admin
-    </Typography.Text>
+  <div className="flex h-16 items-center gap-2 border-b border-white/10 px-6">
+    <SafetyCertificateOutlined className="text-lg" style={{ color: THEME_COLORS.primary }} />
+    <Typography.Text className="text-base! font-semibold! text-white!">Sezcuin</Typography.Text>
   </div>
 );
 
@@ -36,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           onClose={() => setMobileNavOpen(false)}
           open={mobileNavOpen}
           size={240}
-          styles={{ body: { padding: 0, backgroundColor: '#111827' } }}
+          styles={{ body: { padding: 0, backgroundColor: THEME_COLORS.darkSurface } }}
         >
           {BRAND}
           <SidebarMenu onNavigate={() => setMobileNavOpen(false)} />

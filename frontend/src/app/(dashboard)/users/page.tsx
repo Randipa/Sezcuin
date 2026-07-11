@@ -1,21 +1,25 @@
 'use client';
 
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Alert, App, Button, Space, Tag, Typography } from 'antd';
+import { CheckCircleOutlined, EditOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import { App, Button, Col, Row, Space, Tag, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Can } from '@/components/common/can';
 import { ConfirmDeleteButton } from '@/components/common/confirm-delete-button';
 import { DataTable } from '@/components/common/data-table';
+import { ErrorState } from '@/components/common/empty-state';
+import { PageHeader } from '@/components/common/page-header';
+import { StatCard } from '@/components/common/stat-card';
 import { useDeleteUserMutation, useUsersQuery } from '@/features/users/hooks';
 import { UserDetailDrawer } from '@/features/users/components/user-detail-drawer';
 import { UserFormDrawer } from '@/features/users/components/user-form-drawer';
 import type { UserRecord } from '@/features/users/types';
 import { ApiError } from '@/lib/api/error';
 import { PERMISSIONS } from '@/lib/permissions';
+import { ENTITY_ACCENT_COLORS, THEME_COLORS } from '@/lib/theme';
 
 export default function UsersPage() {
-  const { data: users, isLoading, isError, error } = useUsersQuery();
+  const { data: users, isLoading, isError, error, refetch } = useUsersQuery();
   const deleteMutation = useDeleteUserMutation();
   const { message } = App.useApp();
 
@@ -28,6 +32,11 @@ export default function UsersPage() {
     open: false,
     mode: 'create',
   });
+
+  const activeUsersCount = useMemo(
+    () => users?.filter((user) => user.isActive).length ?? 0,
+    [users],
+  );
 
   const openCreateForm = () => setFormState({ open: true, mode: 'create' });
   const openEditForm = (user: UserRecord) => {
@@ -79,16 +88,23 @@ export default function UsersPage() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 100,
       render: (_, record) => (
         <Space onClick={(event) => event.stopPropagation()}>
           <Can permission={PERMISSIONS.USER_UPDATE}>
-            <Button size="small" icon={<EditOutlined />} onClick={() => openEditForm(record)} />
+            <Tooltip title="Edit user">
+              <Button
+                size="small"
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => openEditForm(record)}
+              />
+            </Tooltip>
           </Can>
           <Can permission={PERMISSIONS.USER_DELETE}>
             <ConfirmDeleteButton
-              title="Delete this user?"
-              description="This action cannot be undone."
+              title={`Delete ${record.firstName} ${record.lastName}?`}
+              description="They'll lose access right away, and this can't be undone."
               onConfirm={() => handleDelete(record)}
               loading={deleteMutation.isPending}
               buttonProps={{ size: 'small', danger: true, type: 'text' }}
@@ -100,26 +116,47 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Typography.Title level={3} className="mb-0!">
-          Users
-        </Typography.Title>
-        <Can permission={PERMISSIONS.USER_CREATE}>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
-            Create user
-          </Button>
-        </Can>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Users"
+        subtitle="View, invite and manage the people in your workspace."
+        actions={
+          <Can permission={PERMISSIONS.USER_CREATE}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateForm}>
+              Create user
+            </Button>
+          </Can>
+        }
+      />
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12}>
+          <StatCard
+            title="Total users"
+            value={users?.length ?? 0}
+            loading={isLoading}
+            icon={<TeamOutlined />}
+            accentColor={ENTITY_ACCENT_COLORS.users}
+          />
+        </Col>
+        <Col xs={24} sm={12}>
+          <StatCard
+            title="Active users"
+            value={activeUsersCount}
+            loading={isLoading}
+            icon={<CheckCircleOutlined />}
+            accentColor={THEME_COLORS.success}
+          />
+        </Col>
+      </Row>
 
       {isError ? (
-        <Alert
-          type="error"
-          showIcon
-          message="Failed to load users"
+        <ErrorState
+          title="Failed to load users"
           description={
             error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'
           }
+          onRetry={() => refetch()}
         />
       ) : (
         <DataTable<UserRecord>
