@@ -6,15 +6,20 @@ A full-stack admin console for managing users and roles with JWT authentication 
 
 ## High Level Architecture
 
-High Level Architecture.drawio.png
+<img width="1257" height="641" alt="High Level Architecture drawio" src="https://github.com/user-attachments/assets/37f4ad98-3732-49bf-8643-e973c849dbdb" />
+
 
 ## Back-end Architecture
 
-Backend Architecture.drawio.png
+<img width="1201" height="961" alt="Backend Architecture drawio" src="https://github.com/user-attachments/assets/cd061edd-817b-4f8c-a9d8-f0e273dbbc78" />
+
+
 
 ## Front-end Architecture
 
-Frontend Architecture.drawio.png
+
+<img width="942" height="961" alt="Frontend Architecture drawio" src="https://github.com/user-attachments/assets/d63e6921-a6b5-4a68-a029-ae0567c3a8a4" />
+
 
 ## Database Architecture
 
