@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# SST
+.sst/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.log
