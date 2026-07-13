@@ -1,0 +1,13 @@
+title = "Sezcuin gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Build artifacts and known false positives from git history"
+paths = [
+  '''(?:^|/)frontend/\.open-next/''',
+  '''(?:^|/)frontend/\.next/''',
+  '''(?:^|/)\.github/workflows/cd\.yml''',
+  '''(?:^|/)backend/README\.md''',
+]

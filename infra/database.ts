@@ -1,7 +1,7 @@
 // Demo budget: VPC without NAT (~$0) + RDS db.t4g.micro (~$14/mo in us-east-1).
 // Lambda reaches RDS over the private VPC; no NAT until SES/outbound is needed.
 
-const dbPassword = new sst.Secret("PostgresPassword", "sezcuin-demo-pass");
+const dbPassword = new sst.Secret("PostgresPassword");
 
 export const vpc = new sst.aws.Vpc("Vpc");
 

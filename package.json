@@ -12,6 +12,7 @@
     "sst:install": "sst install"
   },
   "devDependencies": {
-    "sst": "^4.17.1"
+    "sst": "^4.17.1",
+    "typescript": "^5.7.3"
   }
 }
