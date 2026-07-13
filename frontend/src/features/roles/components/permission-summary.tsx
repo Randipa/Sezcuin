@@ -1,7 +1,7 @@
 'use client';
 
 import { Tag, Typography } from 'antd';
-import { getModuleAccessSummary } from '@/lib/permissions';
+import { getModuleAccessSummary } from '@/lib/auth/permissions';
 
 interface PermissionSummaryProps {
   permissions: readonly string[];

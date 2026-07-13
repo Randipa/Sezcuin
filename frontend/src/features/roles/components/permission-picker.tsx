@@ -2,7 +2,7 @@
 
 import { Checkbox, Typography } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { PERMISSION_GROUPS, PERMISSION_MODULE_COLORS } from '@/lib/permissions';
+import { PERMISSION_GROUPS, PERMISSION_MODULE_COLORS } from '@/lib/auth/permissions';
 import { THEME_COLORS } from '@/lib/theme';
 
 interface PermissionPickerProps {
@@ -13,9 +13,9 @@ interface PermissionPickerProps {
 export function PermissionPicker({ value = [], onChange }: PermissionPickerProps) {
   const selected = new Set(value);
 
-  const toggleGroup = (groupValues: string[], checked: boolean) => {
+  const applyToggle = (permissionsToToggle: string[], checked: boolean) => {
     const next = new Set(value);
-    groupValues.forEach((permission) => {
+    permissionsToToggle.forEach((permission) => {
       if (checked) {
         next.add(permission);
       } else {
@@ -26,17 +26,11 @@ export function PermissionPicker({ value = [], onChange }: PermissionPickerProps
   };
 
   const handleGroupToggle = (groupValues: string[]) => (event: CheckboxChangeEvent) => {
-    toggleGroup(groupValues, event.target.checked);
+    applyToggle(groupValues, event.target.checked);
   };
 
   const handlePermissionToggle = (permission: string, checked: boolean) => {
-    const next = new Set(value);
-    if (checked) {
-      next.add(permission);
-    } else {
-      next.delete(permission);
-    }
-    onChange?.([...next]);
+    applyToggle([permission], checked);
   };
 
   return (

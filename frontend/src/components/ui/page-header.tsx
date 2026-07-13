@@ -9,11 +9,6 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-/**
- * Shared title block for top-level dashboard pages. Keeping the
- * title/subtitle/actions layout in one place ensures every page in the
- * app opens with the same spacing and typography rhythm.
- */
 export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">

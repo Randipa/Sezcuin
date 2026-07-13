@@ -2,7 +2,7 @@
 
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { Empty, Typography } from 'antd';
-import { groupPermissionsByModule } from '@/lib/permissions';
+import { groupPermissionsByModule } from '@/lib/auth/permissions';
 
 interface PermissionListProps {
   permissions: readonly string[];

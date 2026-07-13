@@ -2,7 +2,7 @@
 
 import { Button, Result } from 'antd';
 import { useRouter } from 'next/navigation';
-import { AuthShell } from '@/components/common/auth-shell';
+import { AuthShell } from '@/components/layout/auth-shell';
 
 export default function ForbiddenPage() {
   const router = useRouter();

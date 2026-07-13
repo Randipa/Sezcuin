@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useHasPermission } from '@/features/auth/auth-store';
-import type { Permission } from '@/lib/permissions';
+import type { Permission } from '@/lib/auth/permissions';
 
 interface CanProps {
   permission: Permission | Permission[];

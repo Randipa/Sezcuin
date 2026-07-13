@@ -1,7 +1,7 @@
 'use client';
 
-import { AdminOverview } from '@/components/dashboard/admin-overview';
-import { PageHeader } from '@/components/common/page-header';
+import { AdminOverview } from '@/features/dashboard/components/admin-overview';
+import { PageHeader } from '@/components/ui/page-header';
 import { useCurrentUser } from '@/features/auth/auth-store';
 
 function getGreeting(): string {

@@ -47,8 +47,6 @@ User and role management endpoints are intentionally **admin-only** - there is n
 npm run seed
 ```
 
-
-
 The script is safe to re-run - it only creates what's missing and never overwrites an existing user's password.
 
 ## Available scripts

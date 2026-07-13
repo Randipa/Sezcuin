@@ -2,11 +2,11 @@
 
 import { Spin } from 'antd';
 import { useEffect } from 'react';
-import { PasswordResetModal } from '@/components/auth/password-reset-modal';
+import { PasswordResetModal } from '@/features/auth/components/password-reset-modal';
 import { AppShell } from '@/components/layout/app-shell';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
 import { LOGIN_ROUTE } from '@/lib/constants';
-import { SESSION_EXPIRED_MESSAGE, setSessionEndedNotice } from '@/lib/session-notice';
+import { SESSION_EXPIRED_MESSAGE, setSessionEndedNotice } from '@/lib/auth/session-notice';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
