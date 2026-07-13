@@ -7,6 +7,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
+function isMessageObject(
+  value: unknown,
+): value is { message?: string | string[] } {
+  return typeof value === 'object' && value !== null && 'message' in value;
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -24,16 +30,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
+    const error = isMessageObject(message)
+      ? (message.message ?? message)
+      : message;
+
     response.status(status).json({
       success: false,
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
-      error:
-        typeof message === 'object' && message !== null
-          ? (message as any).message || message
-          : message,
+      error,
     });
   }
 }

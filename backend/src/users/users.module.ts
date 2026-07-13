@@ -6,14 +6,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RolesModule } from 'src/roles/roles.module';
 import { Password } from './entities/password.entity';
 import { AuthModule } from 'src/auth/auth.module';
-import { RolesGuard } from 'src/core/guards/roles.guard';
 import { Reflector } from '@nestjs/core';
 import { PermissionsGuard } from 'src/core/guards/permissions.guard';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User,Password]), RolesModule,AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Password]),
+    RolesModule,
+    AuthModule,
+    MailModule,
+  ],
   controllers: [UsersController],
-  providers: [UsersService,RolesGuard,Reflector,PermissionsGuard],
+  providers: [UsersService, Reflector, PermissionsGuard],
   exports: [TypeOrmModule],
 })
 export class UsersModule {}

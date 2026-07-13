@@ -2,21 +2,24 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './core/filters/http-exception.filter';
-import { SwaggerModule } from 'node_modules/@nestjs/swagger/dist/swagger-module';
-import { DocumentBuilder } from 'node_modules/@nestjs/swagger/dist/document-builder';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.setGlobalPrefix('api');
 
-  //impliment swagger
   const config = new DocumentBuilder()
     .setTitle('Sezcuin API')
     .setDescription('The Sezcuin API description')
@@ -24,9 +27,17 @@ async function bootstrap() {
     .addTag('sezcuin')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const frontendUrl =
+    configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3002';
+
+  app.enableCors({
+    origin: frontendUrl,
+    credentials: true,
+  });
+
+  await app.listen(configService.get<number>('PORT') ?? 3000);
 }
 
 bootstrap().catch((err) => {

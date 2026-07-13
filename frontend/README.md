@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sezcuin Frontend
 
-## Getting Started
+A responsive admin console for user and role management, built with Next.js (App Router), TypeScript, Ant Design, and Tailwind CSS against the NestJS API.
 
-First, run the development server:
+**Backend setup:** [../backend/README.md](../backend/README.md)
+
+## Features
+
+- Email/password login backed by the backend's JWT-based `/auth/login` endpoint.
+- User management: search, view, create, edit, activate/deactivate, and delete accounts.
+- Role management: search, view, create, edit, and delete roles, with a grouped permission picker.
+- Permission-driven UI: navigation, buttons, and actions are shown or hidden based on the signed-in user's permissions (`user:*`, `role:*`). The backend's guards remain the actual authorization boundary.
+- Fully responsive: the sidebar collapses into an off-canvas drawer, and drawers go full-width, below the `lg` breakpoint.
+
+## Prerequisites
+
+- Node.js 20+
+- The backend API running locally (see `../backend/README.md`), by default on `http://localhost:3000`.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app runs on **http://localhost:3002** (the backend's CORS configuration only allows this origin).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy `.env.local` (already present for local dev) and adjust if your API runs elsewhere:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+```
 
-## Learn More
+## Signing in
 
-To learn more about Next.js, take a look at the following resources:
+The backend has no public sign-up route by design (all user/role management is admin-only). Bootstrap an admin account by running the seed script in `../backend`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd ../backend
+npm run seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This creates an `ADMIN` role with full permissions and an admin account (`admin@sezcuin.com` by default - see the backend README for how to override the email/password via environment variables).
 
-## Deploy on Vercel
+## Available scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - start the dev server on port 3002.
+- `npm run build` - production build.
+- `npm run start` - run the production build on port 3002.
+- `npm run lint` - ESLint (includes Prettier formatting rules).
+- `npm run format` - format the codebase with Prettier.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project structure
+
+```
+src/
+  app/                 Routes (App Router). (dashboard) is a route group for authenticated pages.
+  components/
+    common/            Reusable CRUD building blocks: DataTable, FormDrawer, DetailDrawer, Can.
+    layout/            App shell: sidebar, header, responsive navigation.
+  features/
+    auth/              Auth store (Zustand), login API call, session types.
+    users/, roles/      Per-feature API calls, React Query hooks, and drawer components.
+  lib/                 Axios client, permission catalog, JWT decoding, shared constants.
+  proxy.ts             Optimistic, cookie-presence-only route protection (Next.js 16's proxy/middleware file).
+```
