@@ -1,4 +1,4 @@
-# Sezcuin API
+# Sezcuin 
 
 A NestJS + TypeORM + PostgreSQL backend providing JWT authentication, permission-based access control, and user/role management for the Sezcuin Admin frontend. New users are onboarded through email invitations rather than public sign-up.
 
