@@ -3,7 +3,7 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Empty, Input, Table } from 'antd';
 import type { TableProps } from 'antd';
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface DataTableProps<T> {
   data: T[] | undefined;
@@ -27,18 +27,17 @@ export function DataTable<T>({
   toolbarExtra,
 }: DataTableProps<T>) {
   const [query, setQuery] = useState('');
-  const deferredQuery = useDeferredValue(query);
 
   const filteredData = useMemo(() => {
     if (!data) {
       return [];
     }
-    const trimmed = deferredQuery.trim().toLowerCase();
+    const trimmed = query.trim().toLowerCase();
     if (!trimmed) {
       return data;
     }
     return data.filter((record) => filterPredicate(record, trimmed));
-  }, [data, deferredQuery, filterPredicate]);
+  }, [data, query, filterPredicate]);
 
   return (
     <div className="flex flex-col gap-4">

@@ -2,7 +2,7 @@
 
 import { App, Form, Input, Select, Switch } from 'antd';
 import { useEffect } from 'react';
-import { FormDrawer } from '@/components/common/form-drawer';
+import { FormDrawer } from '@/components/ui/form-drawer';
 import { useRolesQuery } from '@/features/roles/hooks';
 import { ApiError } from '@/lib/api/error';
 import { useCreateUserMutation, useUpdateUserMutation } from '../hooks';

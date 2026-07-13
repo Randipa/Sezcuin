@@ -8,12 +8,12 @@ import {
 } from '@ant-design/icons';
 import { Card, Col, Row, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
-import { Can } from '@/components/common/can';
-import { StatCard } from '@/components/common/stat-card';
+import { Can } from '@/components/ui/can';
+import { StatCard } from '@/components/ui/stat-card';
 import { useUsersQuery } from '@/features/users/hooks';
 import { useRolesQuery } from '@/features/roles/hooks';
 import { useHasPermission } from '@/features/auth/auth-store';
-import { PERMISSIONS } from '@/lib/permissions';
+import { PERMISSIONS } from '@/lib/auth/permissions';
 import { ENTITY_ACCENT_COLORS, THEME_COLORS } from '@/lib/theme';
 
 interface ShortcutCardProps {

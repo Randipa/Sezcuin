@@ -2,7 +2,7 @@
 
 import { App, Form, Input, Typography } from 'antd';
 import { useEffect } from 'react';
-import { FormDrawer } from '@/components/common/form-drawer';
+import { FormDrawer } from '@/components/ui/form-drawer';
 import { ApiError } from '@/lib/api/error';
 import { PermissionPicker } from './permission-picker';
 import { useCreateRoleMutation, useUpdateRoleMutation } from '../hooks';

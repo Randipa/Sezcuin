@@ -1,4 +1,4 @@
-# Sezcuin Admin Frontend
+# Sezcuin Frontend
 
 A responsive admin console for user and role management, built with Next.js (App Router), TypeScript, Ant Design, and Tailwind CSS against the NestJS API.
 

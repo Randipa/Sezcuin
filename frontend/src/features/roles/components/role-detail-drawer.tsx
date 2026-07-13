@@ -2,11 +2,11 @@
 
 import { EditOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { App, Button, Space, Tag, Typography } from 'antd';
-import { Can } from '@/components/common/can';
-import { ConfirmDeleteButton } from '@/components/common/confirm-delete-button';
-import { DetailDrawer } from '@/components/common/detail-drawer';
+import { Can } from '@/components/ui/can';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
+import { DetailDrawer } from '@/components/ui/detail-drawer';
 import { ApiError } from '@/lib/api/error';
-import { PERMISSIONS } from '@/lib/permissions';
+import { PERMISSIONS } from '@/lib/auth/permissions';
 import { ENTITY_ACCENT_COLORS } from '@/lib/theme';
 import { PermissionList } from './permission-list';
 import { useDeleteRoleMutation } from '../hooks';

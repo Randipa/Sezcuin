@@ -44,16 +44,6 @@ export const PERMISSION_MODULE_COLORS: Record<string, string> = {
   Roles: ENTITY_ACCENT_COLORS.roles,
 };
 
-const PERMISSION_LABEL_LOOKUP = new Map(
-  PERMISSION_GROUPS.flatMap((group) =>
-    group.permissions.map((permission) => [permission.value, permission.label] as const),
-  ),
-);
-
-export function getPermissionLabel(permission: string): string {
-  return PERMISSION_LABEL_LOOKUP.get(permission as Permission) ?? permission;
-}
-
 export interface GroupedPermissions {
   label: string;
   color: string;
@@ -78,12 +68,12 @@ export function groupPermissionsByModule(permissions: readonly string[]): Groupe
 export function getModuleAccessSummary(
   permissions: readonly string[],
 ): { label: string; color: string; selected: number; total: number }[] {
-  const owned = new Set(permissions);
+  const ownedGroups = groupPermissionsByModule(permissions);
 
   return PERMISSION_GROUPS.map((group) => ({
     label: group.label,
     color: PERMISSION_MODULE_COLORS[group.label] ?? THEME_COLORS.neutral,
-    selected: group.permissions.filter((permission) => owned.has(permission.value)).length,
+    selected: ownedGroups.find((owned) => owned.label === group.label)?.permissions.length ?? 0,
     total: group.permissions.length,
   })).filter((summary) => summary.selected > 0);
 }

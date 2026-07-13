@@ -4,18 +4,18 @@ import { CheckCircleOutlined, EditOutlined, PlusOutlined, TeamOutlined } from '@
 import { App, Button, Col, Row, Space, Tag, Tooltip } from 'antd';
 import type { TableProps } from 'antd';
 import { useMemo, useState } from 'react';
-import { Can } from '@/components/common/can';
-import { ConfirmDeleteButton } from '@/components/common/confirm-delete-button';
-import { DataTable } from '@/components/common/data-table';
-import { ErrorState } from '@/components/common/empty-state';
-import { PageHeader } from '@/components/common/page-header';
-import { StatCard } from '@/components/common/stat-card';
+import { Can } from '@/components/ui/can';
+import { ConfirmDeleteButton } from '@/components/ui/confirm-delete-button';
+import { DataTable } from '@/components/ui/data-table';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageHeader } from '@/components/ui/page-header';
+import { StatCard } from '@/components/ui/stat-card';
 import { useDeleteUserMutation, useUsersQuery } from '@/features/users/hooks';
 import { UserDetailDrawer } from '@/features/users/components/user-detail-drawer';
 import { UserFormDrawer } from '@/features/users/components/user-form-drawer';
 import type { UserRecord } from '@/features/users/types';
 import { ApiError } from '@/lib/api/error';
-import { PERMISSIONS } from '@/lib/permissions';
+import { PERMISSIONS } from '@/lib/auth/permissions';
 import { ENTITY_ACCENT_COLORS, THEME_COLORS } from '@/lib/theme';
 
 export default function UsersPage() {

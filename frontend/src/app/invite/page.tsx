@@ -3,7 +3,7 @@
 import { App, Spin, Typography } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
-import { AuthShell } from '@/components/common/auth-shell';
+import { AuthShell } from '@/components/layout/auth-shell';
 import { acceptInvite } from '@/features/auth/auth-api';
 import { useAuthStore } from '@/features/auth/auth-store';
 import { DEFAULT_AUTHENTICATED_ROUTE, LOGIN_ROUTE } from '@/lib/constants';

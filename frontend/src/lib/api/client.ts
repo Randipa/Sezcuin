@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL, LOGIN_ROUTE } from '@/lib/constants';
 import { useAuthStore } from '@/features/auth/auth-store';
-import { setSessionEndedNotice } from '@/lib/session-notice';
+import { setSessionEndedNotice } from '@/lib/auth/session-notice';
 import { toApiError } from './error';
 
 export const apiClient = axios.create({

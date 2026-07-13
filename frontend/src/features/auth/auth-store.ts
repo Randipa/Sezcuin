@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { AUTH_STORAGE_KEY } from '@/lib/constants';
-import { clearSessionCookie, markSessionCookie } from '@/lib/auth-cookie';
-import { decodeAccessToken } from '@/lib/jwt';
-import { hasPermission, type Permission } from '@/lib/permissions';
+import { clearSessionCookie, markSessionCookie } from '@/lib/auth/auth-cookie';
+import { decodeAccessToken } from '@/lib/auth/jwt';
+import { hasPermission, type Permission } from '@/lib/auth/permissions';
 import type { AuthenticatedUser, LoginResponse } from './types';
 
 interface AuthState {

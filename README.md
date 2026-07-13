@@ -1,6 +1,25 @@
-# Sezcuin Admin
+# Sezcuin 
 
 A full-stack admin console for managing users and roles with JWT authentication and permission-based access control.
+
+## SYESTEM DESIGN
+
+## High Level Architecture
+
+High Level Architecture.drawio.png
+
+## Back-end Architecture
+
+Backend Architecture.drawio.png
+
+## Front-end Architecture
+
+Frontend Architecture.drawio.png
+
+## Database Architecture
+
+https://dbdiagram.io/d/6a543c314ac62e474c8ab452
+
 
 | Part | Stack |
 |------|-------|
@@ -24,3 +43,4 @@ Detailed instructions live in each package's README:
 | Frontend | http://localhost:3002 |
 | Backend API | http://localhost:3000 |
 | Swagger | http://localhost:3000/api/docs |
+

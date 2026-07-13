@@ -12,11 +12,6 @@ interface AuthShellProps {
   maxWidthClassName?: string;
 }
 
-/**
- * Shared centered-card frame for every unauthenticated/standalone screen
- * (login, forbidden, invite) so they read as one product instead of three
- * unrelated layouts.
- */
 export function AuthShell({
   title,
   subtitle,

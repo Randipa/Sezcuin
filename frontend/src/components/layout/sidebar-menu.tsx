@@ -5,7 +5,7 @@ import type { MenuProps } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { useAuthStore } from '@/features/auth/auth-store';
-import { hasPermission } from '@/lib/permissions';
+import { hasPermission } from '@/lib/auth/permissions';
 import { NAV_ITEMS } from './nav-items';
 
 interface SidebarMenuProps {

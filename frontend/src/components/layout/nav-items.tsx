@@ -1,6 +1,6 @@
 import { DashboardOutlined, SafetyCertificateOutlined, TeamOutlined } from '@ant-design/icons';
 import type { ReactNode } from 'react';
-import { PERMISSIONS, type Permission } from '@/lib/permissions';
+import { PERMISSIONS, type Permission } from '@/lib/auth/permissions';
 
 export interface NavItem {
   key: string;

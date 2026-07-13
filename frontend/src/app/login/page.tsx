@@ -5,12 +5,12 @@ import { useMutation } from '@tanstack/react-query';
 import { Alert, App, Button, Form, Input } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { AuthShell } from '@/components/common/auth-shell';
+import { AuthShell } from '@/components/layout/auth-shell';
 import { login } from '@/features/auth/auth-api';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
 import { ApiError } from '@/lib/api/error';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/lib/constants';
-import { consumeSessionEndedNotice } from '@/lib/session-notice';
+import { consumeSessionEndedNotice } from '@/lib/auth/session-notice';
 import type { LoginCredentials } from '@/features/auth/types';
 
 export default function LoginPage() {
@@ -67,7 +67,7 @@ export default function LoginPage() {
           className="mb-4"
           type="error"
           showIcon
-          message={loginError}
+          title={loginError}
           closable
           onClose={() => setLoginError(null)}
         />
@@ -78,7 +78,7 @@ export default function LoginPage() {
           className="mb-4"
           type="warning"
           showIcon
-          message={sessionNotice}
+          title={sessionNotice}
           closable
           onClose={() => setSessionNotice(null)}
         />
