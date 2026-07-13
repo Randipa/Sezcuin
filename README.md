@@ -26,6 +26,8 @@ A full-stack admin console for managing users and roles with JWT authentication 
 https://dbdiagram.io/d/6a543c314ac62e474c8ab452
 
 
+
+
 | Part | Stack |
 |------|-------|
 | Backend | NestJS, TypeORM, PostgreSQL |
