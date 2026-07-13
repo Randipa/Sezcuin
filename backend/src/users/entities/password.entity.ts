@@ -12,7 +12,7 @@ export class Password {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'password_hash', select: false })
+  @Column({ name: 'password_hash', type: 'varchar', select: false })
   passwordHash!: string;
 
   @OneToOne(() => User, (user) => user.password, { onDelete: 'CASCADE' })
