@@ -6,6 +6,30 @@
 
 declare module "sst" {
   export interface Resource {
+    "Api": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "JwtSecret": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "PostgresDb": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "PostgresHost": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "PostgresPassword": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "PostgresUser": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
   }
 }
 
