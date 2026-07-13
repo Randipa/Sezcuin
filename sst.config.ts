@@ -15,7 +15,10 @@ export default $config({
     };
   },
   async run() {
-    // Infrastructure modules will be wired here in later tasks.
-    return {};
+    const { api } = await import("./infra/api");
+
+    return {
+      api: api.url,
+    };
   },
 });
