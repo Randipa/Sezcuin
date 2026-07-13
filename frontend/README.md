@@ -63,5 +63,5 @@ src/
     auth/              Auth store (Zustand), login API call, session types.
     users/, roles/      Per-feature API calls, React Query hooks, and drawer components.
   lib/                 Axios client, permission catalog, JWT decoding, shared constants.
-  proxy.ts             Optimistic, cookie-presence-only route protection (Next.js 16's proxy/middleware file).
+  proxy.ts             Optimistic, cookie-presence-only route protection (Next.js 16's proxy/middleware file)...
 ```

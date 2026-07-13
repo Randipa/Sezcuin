@@ -8,6 +8,11 @@ const eslintConfig = defineConfig([
   ...nextTs,
   eslintPluginPrettierRecommended,
   {
+    settings: {
+      react: {
+        version: '19.2.7',
+      },
+    },
     rules: {
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },

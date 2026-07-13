@@ -23,6 +23,10 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # eslint-config-next / eslint-plugin-react are not ESLint 10-ready yet.
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
     commit-message:
       prefix: "chore(frontend deps)"
 
