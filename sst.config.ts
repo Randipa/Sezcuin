@@ -16,11 +16,15 @@ export default $config({
   },
   async run() {
     const { postgres } = await import("./infra/database");
-    const { api } = await import("./infra/api");
+    const { api, attachApiRoutes } = await import("./infra/api");
+    const { web } = await import("./infra/web");
     const { seed } = await import("./infra/seed");
+
+    attachApiRoutes(web.url);
 
     return {
       api: api.url,
+      web: web.url,
       database: postgres.host,
       seed: seed.name,
     };

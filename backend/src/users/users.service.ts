@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -31,8 +32,8 @@ export class UsersService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
 
-    private readonly mailService: MailService,
-    private readonly configService: ConfigService,
+    @Inject(MailService) private readonly mailService: MailService,
+    @Inject(ConfigService) private readonly configService: ConfigService,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {

@@ -49,6 +49,10 @@ declare module "sst" {
     "Vpc": {
       "type": "sst.aws.Vpc"
     }
+    "Web": {
+      "type": "sst.aws.Nextjs"
+      "url": string
+    }
   }
 }
 
