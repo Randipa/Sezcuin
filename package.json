@@ -1,0 +1,16 @@
+{
+  "name": "sezcuin",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:sst": "sst dev",
+    "deploy:sst": "sst deploy",
+    "sst:install": "sst install"
+  },
+  "devDependencies": {
+    "sst": "^4.17.1"
+  }
+}
