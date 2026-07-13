@@ -26,37 +26,6 @@ const backendDependencies = [
   "typeorm",
 ];
 
-const apiHandler = {
-  handler: "backend/src/lambda.handler",
-  timeout: "30 seconds" as const,
-  memory: "1024 MB" as const,
-  vpc,
-  link: [postgres],
-  environment: {
-    NODE_ENV: "production",
-    JWT_SECRET: jwtSecret.value,
-    FRONTEND_URL: "http://localhost:3002",
-    POSTGRES_HOST: postgres.host,
-    POSTGRES_PORT: postgres.port.apply((port) => String(port)),
-    POSTGRES_USER: postgres.username,
-    POSTGRES_PASSWORD: postgres.password,
-    POSTGRES_DB: postgres.database,
-    POSTGRES_SSL: "true",
-    SMTP_HOST: "smtp.gmail.com",
-    SMTP_PORT: "587",
-    SMTP_USER: "",
-    SMTP_PASS: "",
-    MAIL_FROM: "Sezcuin <noreply@example.com>",
-  },
-  nodejs: {
-    format: "cjs" as const,
-    install: backendDependencies,
-    esbuild: {
-      external: ["@nestjs/microservices", "@nestjs/websockets"],
-    },
-  },
-};
-
 export const api = new sst.aws.ApiGatewayV2("Api", {
   cors: {
     allowOrigins: ["*"],
@@ -65,4 +34,35 @@ export const api = new sst.aws.ApiGatewayV2("Api", {
   },
 });
 
-api.route("$default", apiHandler);
+export function attachApiRoutes(frontendUrl: $util.Input<string>) {
+  api.route("$default", {
+    handler: "backend/src/lambda.handler",
+    timeout: "30 seconds",
+    memory: "1024 MB",
+    vpc,
+    link: [postgres],
+    environment: {
+      NODE_ENV: "production",
+      JWT_SECRET: jwtSecret.value,
+      FRONTEND_URL: frontendUrl,
+      POSTGRES_HOST: postgres.host,
+      POSTGRES_PORT: postgres.port.apply((port) => String(port)),
+      POSTGRES_USER: postgres.username,
+      POSTGRES_PASSWORD: postgres.password,
+      POSTGRES_DB: postgres.database,
+      POSTGRES_SSL: "true",
+      SMTP_HOST: "smtp.gmail.com",
+      SMTP_PORT: "587",
+      SMTP_USER: "",
+      SMTP_PASS: "",
+      MAIL_FROM: "Sezcuin <noreply@example.com>",
+    },
+    nodejs: {
+      format: "cjs" as const,
+      install: backendDependencies,
+      esbuild: {
+        external: ["@nestjs/microservices", "@nestjs/websockets"],
+      },
+    },
+  });
+}
