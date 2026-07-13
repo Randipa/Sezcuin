@@ -19,6 +19,10 @@ import { User } from 'src/users/entities/user.entity';
         database: configService.get<string>('POSTGRES_DB'),
         entities: [User, Password, Role],
         synchronize: true,
+        ssl:
+          configService.get<string>('POSTGRES_SSL') === 'true'
+            ? { rejectUnauthorized: false }
+            : undefined,
       }),
     }),
   ],

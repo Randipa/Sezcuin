@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Inject,
   UseGuards,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
@@ -21,7 +22,9 @@ import { ApiBearerAuth, ApiTags } from 'node_modules/@nestjs/swagger';
 @Controller('roles')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(
+    @Inject(RolesService) private readonly rolesService: RolesService,
+  ) {}
 
   @Post()
   @Permissions('role:create')

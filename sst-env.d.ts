@@ -10,15 +10,15 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
     }
+    "Database": {
+      "database": string
+      "host": string
+      "password": string
+      "port": number
+      "type": "sst.aws.Postgres"
+      "username": string
+    }
     "JwtSecret": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "PostgresDb": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "PostgresHost": {
       "type": "sst.sst.Secret"
       "value": string
     }
@@ -26,9 +26,28 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
-    "PostgresUser": {
+    "Seed": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "SeedAdminEmail": {
       "type": "sst.sst.Secret"
       "value": string
+    }
+    "SeedAdminFirstName": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "SeedAdminLastName": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "SeedAdminPassword": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "Vpc": {
+      "type": "sst.aws.Vpc"
     }
   }
 }
