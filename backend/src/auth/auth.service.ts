@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class AuthService {
     @InjectRepository(Password)
     private readonly passwordRepository: Repository<Password>,
 
-    private readonly jwtService: JwtService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
   async login(loginDto: LoginDto) {

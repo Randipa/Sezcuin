@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "dev:sst": "sst dev",
-    "deploy:sst": "sst deploy",
+    "deploy:sst": "npm run build --workspace=backend && sst deploy",
+    "seed:aws": "aws lambda invoke --function-name \"$(aws lambda list-functions --query \"Functions[?contains(FunctionName,'sezcuin-saliya-Seed')].FunctionName | [0]\" --output text)\" --payload '{}' --cli-binary-format raw-in-base64-out /tmp/sezcuin-seed-out.json && cat /tmp/sezcuin-seed-out.json && echo",
     "sst:install": "sst install"
   },
   "devDependencies": {

@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -16,7 +17,7 @@ import type { AuthenticatedUserPayload } from 'src/core/types/authenticated-requ
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')

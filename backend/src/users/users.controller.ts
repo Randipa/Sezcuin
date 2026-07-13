@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Inject,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -20,7 +21,9 @@ import { ApiBearerAuth, ApiTags } from 'node_modules/@nestjs/swagger';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    @Inject(UsersService) private readonly usersService: UsersService,
+  ) {}
 
   @Post('register')
   @Permissions('user:create')

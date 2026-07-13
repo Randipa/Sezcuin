@@ -15,10 +15,14 @@ export default $config({
     };
   },
   async run() {
+    const { postgres } = await import("./infra/database");
     const { api } = await import("./infra/api");
+    const { seed } = await import("./infra/seed");
 
     return {
       api: api.url,
+      database: postgres.host,
+      seed: seed.name,
     };
   },
 });
