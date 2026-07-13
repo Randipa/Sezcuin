@@ -17,9 +17,7 @@ import type { AuthenticatedUserPayload } from 'src/core/types/authenticated-requ
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject(AuthService) private readonly authService: AuthService,
-  ) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
