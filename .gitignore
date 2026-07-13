@@ -1,6 +1,12 @@
 # Dependencies
 node_modules/
 
+# Next.js / OpenNext build output
+.next/
+.open-next/
+frontend/.next/
+frontend/.open-next/
+
 # SST
 .sst/
 

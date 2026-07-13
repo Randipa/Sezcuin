@@ -1,6 +1,6 @@
-export const jwtSecret = new sst.Secret("JwtSecret", "change-me-dev-only");
+export const jwtSecret = new sst.Secret("JwtSecret");
 
-export const seedAdminEmail = new sst.Secret("SeedAdminEmail", "admin@gmail.com");
-export const seedAdminPassword = new sst.Secret("SeedAdminPassword", "Admin0987");
-export const seedAdminFirstName = new sst.Secret("SeedAdminFirstName", "Admin");
-export const seedAdminLastName = new sst.Secret("SeedAdminLastName", "Admin1");
+export const seedAdminEmail = new sst.Secret("SeedAdminEmail");
+export const seedAdminPassword = new sst.Secret("SeedAdminPassword");
+export const seedAdminFirstName = new sst.Secret("SeedAdminFirstName");
+export const seedAdminLastName = new sst.Secret("SeedAdminLastName");
