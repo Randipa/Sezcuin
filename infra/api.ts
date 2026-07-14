@@ -1,6 +1,6 @@
 import { postgres, vpc } from "./database";
-import { email } from "./email";
-import { jwtSecret } from "./secrets";
+import { sesPermissions } from "./email";
+import { jwtSecret, sesSenderEmail } from "./secrets";
 
 const backendDependencies = [
   "@aws-sdk/client-sesv2",
@@ -42,7 +42,8 @@ export function attachApiRoutes(frontendUrl: $util.Input<string>) {
     timeout: "30 seconds",
     memory: "1024 MB",
     vpc,
-    link: [postgres, email],
+    link: [postgres],
+    permissions: sesPermissions,
     environment: {
       NODE_ENV: "production",
       JWT_SECRET: jwtSecret.value,
@@ -54,7 +55,7 @@ export function attachApiRoutes(frontendUrl: $util.Input<string>) {
       POSTGRES_DB: postgres.database,
       POSTGRES_SSL: "true",
       MAIL_PROVIDER: "ses",
-      MAIL_FROM: email.sender,
+      MAIL_FROM: sesSenderEmail.value,
     },
     nodejs: {
       format: "cjs" as const,
