@@ -1,15 +1,14 @@
 import { AUTH_COOKIE_NAME } from '@/lib/constants';
 
 function buildSessionCookie(value: string, maxAge?: number): string {
-  const encodedValue = encodeURIComponent(value);
-  const parts = [`${AUTH_COOKIE_NAME}=${encodedValue}`, 'path=/', 'SameSite=Lax'];
+  const parts = [`${AUTH_COOKIE_NAME}=${value}`, 'path=/', 'samesite=lax'];
 
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    parts.push('Secure');
+    parts.push('secure');
   }
 
   if (maxAge !== undefined) {
-    parts.push(`Max-Age=${maxAge}`);
+    parts.push(`max-age=${maxAge}`);
   }
 
   return parts.join('; ');
