@@ -115,8 +115,15 @@ export class MailService {
       if (rejected) {
         const message = error instanceof Error ? error.message : String(error);
         this.logger.error(`SES rejected invite to ${to}: ${message}`);
+
+        if (/not verified/i.test(message)) {
+          throw new ServiceUnavailableException(
+            'Invitation email could not be sent because the SES sender is not verified yet. Check the sender inbox for the AWS verification email and click the link, then try again.',
+          );
+        }
+
         throw new ServiceUnavailableException(
-          'Invitation email could not be sent. Verify the sender in AWS SES. In sandbox mode, recipient emails must be verified too.',
+          'Invitation email could not be sent. Your AWS SES account may still be in sandbox mode—in that case, recipient emails must also be verified in SES.',
         );
       }
 
