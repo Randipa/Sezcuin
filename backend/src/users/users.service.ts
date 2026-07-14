@@ -19,6 +19,7 @@ import {
   getInviteExpiryDate,
   hashInviteToken,
 } from 'src/common/utils/invite-token.util';
+import { normalizeEmail } from 'src/common/utils/email.util';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +38,8 @@ export class UsersService {
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
-    const { email, firstName, lastName, roleName } = createUserDto;
+    const { firstName, lastName, roleName } = createUserDto;
+    const email = normalizeEmail(createUserDto.email);
 
     const existingUser = await this.userRepository.findOne({
       where: { email },

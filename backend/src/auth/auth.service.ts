@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { hashInviteToken } from 'src/common/utils/invite-token.util';
+import { normalizeEmail } from 'src/common/utils/email.util';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,8 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto) {
-    const { email, password } = loginDto;
+    const email = normalizeEmail(loginDto.email);
+    const { password } = loginDto;
 
     const user = await this.userRepository.findOne({
       where: { email },
