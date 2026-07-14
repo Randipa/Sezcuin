@@ -16,6 +16,7 @@
     "seed:aws": "bash scripts/invoke-seed.sh \"${STAGE:-saliya}\"",
     "seed:production": "STAGE=production npm run seed:aws",
     "setup:github-oidc": "bash scripts/setup-github-oidc-role.sh",
+    "check:ses": "bash scripts/check-ses.sh",
     "sync:secrets:production": "bash scripts/sync-sst-secrets.sh production",
     "sst:install": "sst install"
   },
