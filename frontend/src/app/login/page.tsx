@@ -10,6 +10,7 @@ import { login } from '@/features/auth/auth-api';
 import { isSessionValid, useAuthStore } from '@/features/auth/auth-store';
 import { ApiError } from '@/lib/api/error';
 import { DEFAULT_AUTHENTICATED_ROUTE } from '@/lib/constants';
+import { navigateAfterLogin } from '@/lib/auth/post-login-navigation';
 import { consumeSessionEndedNotice } from '@/lib/auth/session-notice';
 import type { LoginCredentials } from '@/features/auth/types';
 
@@ -45,7 +46,7 @@ export default function LoginPage() {
     onSuccess: (response) => {
       setLoginError(null);
       setSession(response);
-      window.location.assign(DEFAULT_AUTHENTICATED_ROUTE);
+      navigateAfterLogin();
     },
     onError: (error) => {
       const apiError = error instanceof ApiError ? error : null;
@@ -89,6 +90,7 @@ export default function LoginPage() {
         onFinish={handleFinish}
         disabled={mutation.isPending}
         requiredMark={false}
+        autoComplete="on"
       >
         <Form.Item
           name="email"
@@ -101,7 +103,11 @@ export default function LoginPage() {
           <Input
             prefix={<MailOutlined className="text-gray-400" />}
             placeholder="you@company.com"
-            autoFocus
+            autoComplete="username email"
+            autoCapitalize="none"
+            autoCorrect="off"
+            inputMode="email"
+            spellCheck={false}
           />
         </Form.Item>
 
@@ -113,6 +119,10 @@ export default function LoginPage() {
           <Input.Password
             prefix={<LockOutlined className="text-gray-400" />}
             placeholder="••••••••"
+            autoComplete="current-password"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
           />
         </Form.Item>
 
