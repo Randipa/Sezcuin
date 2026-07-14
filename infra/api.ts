@@ -1,7 +1,9 @@
 import { postgres, vpc } from "./database";
+import { email } from "./email";
 import { jwtSecret } from "./secrets";
 
 const backendDependencies = [
+  "@aws-sdk/client-sesv2",
   "@nestjs/common",
   "@nestjs/config",
   "@nestjs/core",
@@ -40,7 +42,7 @@ export function attachApiRoutes(frontendUrl: $util.Input<string>) {
     timeout: "30 seconds",
     memory: "1024 MB",
     vpc,
-    link: [postgres],
+    link: [postgres, email],
     environment: {
       NODE_ENV: "production",
       JWT_SECRET: jwtSecret.value,
@@ -51,11 +53,8 @@ export function attachApiRoutes(frontendUrl: $util.Input<string>) {
       POSTGRES_PASSWORD: postgres.password,
       POSTGRES_DB: postgres.database,
       POSTGRES_SSL: "true",
-      SMTP_HOST: "smtp.gmail.com",
-      SMTP_PORT: "587",
-      SMTP_USER: "",
-      SMTP_PASS: "",
-      MAIL_FROM: "Sezcuin <noreply@example.com>",
+      MAIL_PROVIDER: "ses",
+      MAIL_FROM: email.sender,
     },
     nodejs: {
       format: "cjs" as const,
