@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { Role } from './roles/entities/role.entity';
 import { User } from './users/entities/user.entity';
 import { Password } from './users/entities/password.entity';
+import { normalizeEmail } from './common/utils/email.util';
 
 const ADMIN_PERMISSIONS = [
   'user:read',
@@ -65,14 +66,16 @@ export async function runSeed(): Promise<void> {
       console.log('USER role already exists, skipping');
     }
 
-    const adminEmail = process.env.SEED_ADMIN_EMAIL;
+    const rawAdminEmail = process.env.SEED_ADMIN_EMAIL;
     const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
-    if (!adminEmail || !adminPassword) {
+    if (!rawAdminEmail || !adminPassword) {
       throw new Error(
         'SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be set before running seed.',
       );
     }
+
+    const adminEmail = normalizeEmail(rawAdminEmail);
 
     const existingAdmin = await userRepository.findOne({
       where: { email: adminEmail },
