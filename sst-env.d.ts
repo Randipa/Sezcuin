@@ -6,62 +6,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "Api": {
-      "type": "sst.aws.ApiGatewayV2"
-      "url": string
-    }
-    "Database": {
-      "database": string
-      "host": string
-      "password": string
-      "port": number
-      "type": "sst.aws.Postgres"
-      "username": string
-    }
-    "Email": {
-      "configSet": string
-      "sender": string
-      "type": "sst.aws.Email"
-    }
-    "JwtSecret": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "PostgresPassword": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "Seed": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "SeedAdminEmail": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SeedAdminFirstName": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SeedAdminLastName": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SeedAdminPassword": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SesSenderEmail": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "Vpc": {
-      "type": "sst.aws.Vpc"
-    }
-    "Web": {
-      "type": "sst.aws.Nextjs"
-      "url": string
-    }
   }
 }
 
