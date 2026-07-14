@@ -6,11 +6,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node"],
-    "paths": {
-      "@pulumi/aws": ["./.sst/platform/node_modules/@pulumi/aws"],
-      "@pulumi/pulumi": ["./.sst/platform/node_modules/@pulumi/pulumi"]
-    }
+    "types": ["node"]
   },
   "include": ["sst.config.ts", "infra/**/*.ts"]
 }
