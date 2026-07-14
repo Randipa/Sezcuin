@@ -42,12 +42,6 @@ select,
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-inline-end: -8px;
 }
 
 button,

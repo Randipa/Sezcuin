@@ -3,7 +3,6 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { AUTH_STORAGE_KEY } from '@/lib/constants';
 import { clearSessionCookie, markSessionCookie } from '@/lib/auth/auth-cookie';
 import { decodeAccessToken } from '@/lib/auth/jwt';
-import { safeBrowserStorage } from '@/lib/auth/safe-storage';
 import { hasPermission, type Permission } from '@/lib/auth/permissions';
 import type { AuthenticatedUser, LoginResponse } from './types';
 
@@ -55,7 +54,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: AUTH_STORAGE_KEY,
-      storage: createJSONStorage(() => safeBrowserStorage),
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         token: state.token,
         user: state.user,
