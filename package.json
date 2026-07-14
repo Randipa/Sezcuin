@@ -8,7 +8,12 @@
   "scripts": {
     "dev:sst": "sst dev",
     "deploy:sst": "npm run build --workspace=backend && sst deploy",
-    "seed:aws": "aws lambda invoke --function-name \"$(aws lambda list-functions --query \"Functions[?contains(FunctionName,'sezcuin-saliya-Seed')].FunctionName | [0]\" --output text)\" --payload '{}' --cli-binary-format raw-in-base64-out /tmp/sezcuin-seed-out.json && cat /tmp/sezcuin-seed-out.json && echo",
+    "deploy:production": "npm run build --workspace=backend && sst deploy --stage production",
+    "remove:sst": "sst remove",
+    "remove:production": "sst remove --stage production",
+    "seed:aws": "STAGE=${STAGE:-saliya} aws lambda invoke --function-name \"$(aws lambda list-functions --query \"Functions[?contains(FunctionName,'sezcuin-${STAGE}-Seed')].FunctionName | [0]\" --output text)\" --payload '{}' --cli-binary-format raw-in-base64-out /tmp/sezcuin-seed-out.json && cat /tmp/sezcuin-seed-out.json && echo",
+    "seed:production": "STAGE=production npm run seed:aws",
+    "setup:github-oidc": "bash scripts/setup-github-oidc-role.sh",
     "sst:install": "sst install"
   },
   "devDependencies": {

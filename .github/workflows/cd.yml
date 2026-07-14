@@ -1,0 +1,93 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint backend
+        run: npx eslint "{src,test}/**/*.ts" --max-warnings 0
+        working-directory: backend
+
+      - name: Type check backend
+        run: npx tsc --noEmit
+        working-directory: backend
+
+      - name: Test backend
+        run: npm test -- --ci
+        working-directory: backend
+
+      - name: Build backend
+        run: npm run build
+        working-directory: backend
+
+      - name: Lint frontend
+        run: npm run lint --workspace=frontend
+
+      - name: Type check frontend
+        run: npm exec --workspace=frontend -- tsc --noEmit
+
+      - name: Build frontend
+        run: npm run build --workspace=frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  deploy-production:
+    name: Deploy to production
+    needs: quality
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build --workspace=backend
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Install SST platform
+        run: npx sst install
+
+      - name: Deploy SST (production)
+        run: npx sst deploy --stage production
