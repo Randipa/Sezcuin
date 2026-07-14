@@ -3,9 +3,15 @@ import * as pulumi from "@pulumi/pulumi";
 import { vpc } from "./database";
 import { sesSenderEmail } from "./secrets";
 
-export const email = new sst.aws.Email("Email", {
-  sender: sesSenderEmail.value,
-});
+// SES identities are account-wide. One stage creates; others reference the existing identity.
+const SES_IDENTITY_OWNER_STAGE = "saliya";
+
+export const email =
+  $app.stage === SES_IDENTITY_OWNER_STAGE
+    ? new sst.aws.Email("Email", {
+        sender: sesSenderEmail.value,
+      })
+    : sst.aws.Email.get("Email", sesSenderEmail.value);
 
 // Private SES API access for Lambda in VPC (no NAT gateway required).
 export const sesApiEndpoint = pulumi
