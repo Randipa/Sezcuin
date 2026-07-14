@@ -18,6 +18,11 @@ declare module "sst" {
       "type": "sst.aws.Postgres"
       "username": string
     }
+    "Email": {
+      "configSet": string
+      "sender": string
+      "type": "sst.aws.Email"
+    }
     "JwtSecret": {
       "type": "sst.sst.Secret"
       "value": string
@@ -43,6 +48,10 @@ declare module "sst" {
       "value": string
     }
     "SeedAdminPassword": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "SesSenderEmail": {
       "type": "sst.sst.Secret"
       "value": string
     }
