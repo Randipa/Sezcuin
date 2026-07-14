@@ -78,7 +78,7 @@ jobs:
         run: npm ci
 
       - name: Install SST platform
-        run: npm exec sst install
+        run: ./node_modules/.bin/sst install
 
       - name: Build backend
         run: npm run build --workspace=backend
@@ -89,5 +89,16 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
+      - name: Sync SST secrets (production)
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SES_SENDER_EMAIL: ${{ secrets.SES_SENDER_EMAIL }}
+          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SEED_ADMIN_FIRST_NAME: ${{ secrets.SEED_ADMIN_FIRST_NAME }}
+          SEED_ADMIN_LAST_NAME: ${{ secrets.SEED_ADMIN_LAST_NAME }}
+        run: bash scripts/sync-sst-secrets.sh production
+
       - name: Deploy SST (production)
-        run: npm exec sst deploy --stage production
+        run: ./node_modules/.bin/sst deploy --stage production
