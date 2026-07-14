@@ -1,10 +1,9 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 import { vpc } from "./database";
-import { sesSenderEmail } from "./secrets";
 
-// SES identities are account-wide and verified once in AWS. Never create per stage.
-export const email = sst.aws.Email.get("Email", sesSenderEmail.value);
+// SES sender is managed manually in AWS (verified once per account).
+// Lambda sends mail via SESv2 using MAIL_FROM from secrets and the VPC endpoint below.
 
 // Private SES API access for Lambda in VPC (no NAT gateway required).
 export const sesApiEndpoint = pulumi
@@ -19,3 +18,10 @@ export const sesApiEndpoint = pulumi
       privateDnsEnabled: true,
     });
   });
+
+export const sesPermissions = [
+  {
+    actions: ["ses:SendEmail", "ses:SendRawEmail"],
+    resources: ["*"],
+  },
+];
