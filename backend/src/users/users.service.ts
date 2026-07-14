@@ -85,11 +85,17 @@ export class UsersService {
       this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3002';
     const inviteUrl = `${frontendUrl}/invite?token=${inviteToken}`;
 
-    await this.mailService.sendInviteEmail({
-      to: email,
-      firstName,
-      inviteUrl,
-    });
+    try {
+      await this.mailService.sendInviteEmail({
+        to: email,
+        firstName,
+        inviteUrl,
+      });
+    } catch (error) {
+      await this.passwordRepository.delete({ user: { id: savedUser.id } });
+      await this.userRepository.remove(savedUser);
+      throw error;
+    }
 
     return savedUser;
   }
