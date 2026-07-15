@@ -6,6 +6,12 @@
     "frontend"
   ],
   "scripts": {
+    "prepare": "husky",
+    "lint:ci": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npx eslint \"{src,test}/**/*.ts\" --max-warnings 0",
+    "lint:frontend": "npm run lint --workspace=frontend",
+    "typecheck": "npm exec --workspace=backend -- tsc --noEmit && npm exec --workspace=frontend -- tsc --noEmit",
+    "ci:check": "npm run lint:ci && npm run typecheck && npm test -- --ci --workspace=backend && npm run build --workspace=backend && npm run build --workspace=frontend",
     "dev:sst": "sst dev",
     "deploy:sst": "npm run build --workspace=backend && sst deploy",
     "deploy:production": "npm run build --workspace=backend && sst deploy --stage production",
@@ -23,6 +29,8 @@
   "devDependencies": {
     "@pulumi/aws": "^7.36.0",
     "@pulumi/pulumi": "^3.252.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "sst": "^4.17.1",
     "typescript": "^5.7.3"
   }
