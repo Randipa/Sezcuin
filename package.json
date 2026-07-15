@@ -9,7 +9,7 @@
     "prepare": "node scripts/prepare-husky.mjs",
     "lint:ci": "npm run lint:backend && npm run lint:frontend",
     "lint:backend": "cd backend && npx eslint \"{src,test}/**/*.ts\" --max-warnings 0",
-    "lint:frontend": "npm run lint --workspace=frontend",
+    "lint:frontend": "cd frontend && npx eslint src --max-warnings 0",
     "typecheck": "npm exec --workspace=backend -- tsc --noEmit && npm exec --workspace=frontend -- tsc --noEmit",
     "test:backend": "npm test --workspace=backend -- --ci",
     "ci:check": "npm run lint:ci && npm run typecheck && npm run test:backend && npm run build --workspace=backend && npm run build --workspace=frontend",
